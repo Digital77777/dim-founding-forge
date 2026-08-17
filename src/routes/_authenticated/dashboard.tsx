@@ -23,7 +23,7 @@ function Dashboard() {
     if (!userId || isLoading || membership || claiming) return;
     setClaiming(true);
     const name = (profile?.full_name ?? user?.user_metadata?.["full_name"] ?? null) as string | null;
-    supabase.rpc("claim_membership", { _full_name: name ?? undefined }).then(() => {
+    supabase.rpc("claim_membership", name ? { _full_name: name } : {}).then(() => {
       invalidateMember();
     });
   }, [userId, isLoading, membership, claiming, profile, user, invalidateMember]);
