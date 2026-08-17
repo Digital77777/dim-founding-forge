@@ -23,7 +23,7 @@ function Dashboard() {
     if (!userId || isLoading || membership || claiming) return;
     setClaiming(true);
     const name = (profile?.full_name ?? user?.user_metadata?.["full_name"] ?? null) as string | null;
-    supabase.rpc("claim_membership", { _full_name: name }).then(() => {
+    supabase.rpc("claim_membership", { _full_name: name ?? undefined }).then(() => {
       invalidateMember();
     });
   }, [userId, isLoading, membership, claiming, profile, user, invalidateMember]);
@@ -63,7 +63,7 @@ function Dashboard() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <div className="rounded-3xl bg-elite px-6 py-10 text-ink-foreground sm:px-10">
-        <FoundingBadge number={membership?.founding_number} size="md" />
+        <FoundingBadge number={membership?.founding_number ?? null} size="md" />
         <h1 className="mt-5 text-3xl font-bold sm:text-4xl">
           {greeting()}, {firstName(profile, user)}.
         </h1>
