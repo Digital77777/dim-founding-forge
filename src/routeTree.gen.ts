@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedBuildRouteImport } from './routes/_authenticated/build'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
@@ -38,6 +39,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAchievementsRoute =
+  AuthenticatedAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBuildRoute = AuthenticatedBuildRouteImport.update({
   id: '/build',
   path: '/build',
@@ -99,6 +106,7 @@ const AuthenticatedToolsSlugRoute = AuthenticatedToolsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/community': typeof AuthenticatedCommunityRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/community': typeof AuthenticatedCommunityRoute
@@ -131,6 +140,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/build': typeof AuthenticatedBuildRoute
   '/_authenticated/career': typeof AuthenticatedCareerRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/achievements'
     | '/build'
     | '/career'
     | '/community'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/achievements'
     | '/build'
     | '/career'
     | '/community'
@@ -179,6 +191,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/achievements'
     | '/_authenticated/build'
     | '/_authenticated/career'
     | '/_authenticated/community'
@@ -220,6 +233,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/achievements': {
+      id: '/_authenticated/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/build': {
       id: '/_authenticated/build'
@@ -302,6 +322,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedBuildRoute: typeof AuthenticatedBuildRoute
   AuthenticatedCareerRoute: typeof AuthenticatedCareerRoute
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
@@ -316,6 +337,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedBuildRoute: AuthenticatedBuildRoute,
   AuthenticatedCareerRoute: AuthenticatedCareerRoute,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
