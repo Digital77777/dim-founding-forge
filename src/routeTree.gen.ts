@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
+import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -38,6 +39,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
   id: '/community',
   path: '/community',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCreatorRoute = AuthenticatedCreatorRouteImport.update({
+  id: '/creator',
+  path: '/creator',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/community': typeof AuthenticatedCommunityRoute
+  '/creator': typeof AuthenticatedCreatorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/community': typeof AuthenticatedCommunityRoute
+  '/creator': typeof AuthenticatedCreatorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
+  '/_authenticated/creator': typeof AuthenticatedCreatorRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/community'
+    | '/creator'
     | '/dashboard'
     | '/notifications'
     | '/onboarding'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/community'
+    | '/creator'
     | '/dashboard'
     | '/notifications'
     | '/onboarding'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/community'
+    | '/_authenticated/creator'
     | '/_authenticated/dashboard'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
@@ -190,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/community'
       fullPath: '/community'
       preLoaderRoute: typeof AuthenticatedCommunityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creator': {
+      id: '/_authenticated/creator'
+      path: '/creator'
+      fullPath: '/creator'
+      preLoaderRoute: typeof AuthenticatedCreatorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -246,6 +265,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
+  AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -257,6 +277,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
+  AuthenticatedCreatorRoute: AuthenticatedCreatorRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
