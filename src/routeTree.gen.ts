@@ -18,6 +18,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedLearnIndexRouteImport } from './routes/_authenticated/learn.index'
 import { Route as AuthenticatedLearnCourseRouteImport } from './routes/_authenticated/learn.$course'
 import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
+import { Route as AuthenticatedToolsSlugRouteImport } from './routes/_authenticated/tools.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -65,6 +66,11 @@ const AuthenticatedToolsIndexRoute = AuthenticatedToolsIndexRouteImport.update({
   path: '/tools/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedToolsSlugRoute = AuthenticatedToolsSlugRouteImport.update({
+  id: '/tools/$slug',
+  path: '/tools/$slug',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
+  '/tools/$slug': typeof AuthenticatedToolsSlugRoute
   '/learn/': typeof AuthenticatedLearnIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
+  '/tools/$slug': typeof AuthenticatedToolsSlugRoute
   '/learn': typeof AuthenticatedLearnIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/learn/$course': typeof AuthenticatedLearnCourseRoute
+  '/_authenticated/tools/$slug': typeof AuthenticatedToolsSlugRoute
   '/_authenticated/learn/': typeof AuthenticatedLearnIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
 }
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/learn/$course'
+    | '/tools/$slug'
     | '/learn/'
     | '/tools/'
   fileRoutesByTo: FileRoutesByTo
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/onboarding'
     | '/learn/$course'
+    | '/tools/$slug'
     | '/learn'
     | '/tools'
   id:
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
     | '/_authenticated/learn/$course'
+    | '/_authenticated/tools/$slug'
     | '/_authenticated/learn/'
     | '/_authenticated/tools/'
   fileRoutesById: FileRoutesById
@@ -203,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedToolsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tools/$slug': {
+      id: '/_authenticated/tools/$slug'
+      path: '/tools/$slug'
+      fullPath: '/tools/$slug'
+      preLoaderRoute: typeof AuthenticatedToolsSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -211,6 +230,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedLearnCourseRoute: typeof AuthenticatedLearnCourseRoute
+  AuthenticatedToolsSlugRoute: typeof AuthenticatedToolsSlugRoute
   AuthenticatedLearnIndexRoute: typeof AuthenticatedLearnIndexRoute
   AuthenticatedToolsIndexRoute: typeof AuthenticatedToolsIndexRoute
 }
@@ -220,6 +240,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedLearnCourseRoute: AuthenticatedLearnCourseRoute,
+  AuthenticatedToolsSlugRoute: AuthenticatedToolsSlugRoute,
   AuthenticatedLearnIndexRoute: AuthenticatedLearnIndexRoute,
   AuthenticatedToolsIndexRoute: AuthenticatedToolsIndexRoute,
 }
