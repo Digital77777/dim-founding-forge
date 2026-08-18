@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedBuildRouteImport } from './routes/_authenticated/build'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
+import { Route as AuthenticatedComingSoonRouteImport } from './routes/_authenticated/coming-soon'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedConnectRouteImport } from './routes/_authenticated/connect'
 import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
@@ -58,6 +59,11 @@ const AuthenticatedBuildRoute = AuthenticatedBuildRouteImport.update({
 const AuthenticatedCareerRoute = AuthenticatedCareerRouteImport.update({
   id: '/career',
   path: '/career',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedComingSoonRoute = AuthenticatedComingSoonRouteImport.update({
+  id: '/coming-soon',
+  path: '/coming-soon',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
+  '/coming-soon': typeof AuthenticatedComingSoonRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/connect': typeof AuthenticatedConnectRoute
   '/creator': typeof AuthenticatedCreatorRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
+  '/coming-soon': typeof AuthenticatedComingSoonRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/connect': typeof AuthenticatedConnectRoute
   '/creator': typeof AuthenticatedCreatorRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/build': typeof AuthenticatedBuildRoute
   '/_authenticated/career': typeof AuthenticatedCareerRoute
+  '/_authenticated/coming-soon': typeof AuthenticatedComingSoonRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/connect': typeof AuthenticatedConnectRoute
   '/_authenticated/creator': typeof AuthenticatedCreatorRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/build'
     | '/career'
+    | '/coming-soon'
     | '/community'
     | '/connect'
     | '/creator'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/build'
     | '/career'
+    | '/coming-soon'
     | '/community'
     | '/connect'
     | '/creator'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/_authenticated/achievements'
     | '/_authenticated/build'
     | '/_authenticated/career'
+    | '/_authenticated/coming-soon'
     | '/_authenticated/community'
     | '/_authenticated/connect'
     | '/_authenticated/creator'
@@ -313,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/career'
       fullPath: '/career'
       preLoaderRoute: typeof AuthenticatedCareerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/coming-soon': {
+      id: '/_authenticated/coming-soon'
+      path: '/coming-soon'
+      fullPath: '/coming-soon'
+      preLoaderRoute: typeof AuthenticatedComingSoonRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/community': {
@@ -420,6 +439,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedBuildRoute: typeof AuthenticatedBuildRoute
   AuthenticatedCareerRoute: typeof AuthenticatedCareerRoute
+  AuthenticatedComingSoonRoute: typeof AuthenticatedComingSoonRoute
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedConnectRoute: typeof AuthenticatedConnectRoute
   AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
@@ -440,6 +460,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedBuildRoute: AuthenticatedBuildRoute,
   AuthenticatedCareerRoute: AuthenticatedCareerRoute,
+  AuthenticatedComingSoonRoute: AuthenticatedComingSoonRoute,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedConnectRoute: AuthenticatedConnectRoute,
   AuthenticatedCreatorRoute: AuthenticatedCreatorRoute,
