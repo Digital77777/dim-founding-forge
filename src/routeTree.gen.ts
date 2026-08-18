@@ -16,6 +16,7 @@ import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authent
 import { Route as AuthenticatedBuildRouteImport } from './routes/_authenticated/build'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
+import { Route as AuthenticatedConnectRouteImport } from './routes/_authenticated/connect'
 import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -61,6 +62,11 @@ const AuthenticatedCareerRoute = AuthenticatedCareerRouteImport.update({
 const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
   id: '/community',
   path: '/community',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedConnectRoute = AuthenticatedConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCreatorRoute = AuthenticatedCreatorRouteImport.update({
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/community': typeof AuthenticatedCommunityRoute
+  '/connect': typeof AuthenticatedConnectRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/community': typeof AuthenticatedCommunityRoute
+  '/connect': typeof AuthenticatedConnectRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/_authenticated/build': typeof AuthenticatedBuildRoute
   '/_authenticated/career': typeof AuthenticatedCareerRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
+  '/_authenticated/connect': typeof AuthenticatedConnectRoute
   '/_authenticated/creator': typeof AuthenticatedCreatorRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/build'
     | '/career'
     | '/community'
+    | '/connect'
     | '/creator'
     | '/dashboard'
     | '/notifications'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/build'
     | '/career'
     | '/community'
+    | '/connect'
     | '/creator'
     | '/dashboard'
     | '/notifications'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/_authenticated/build'
     | '/_authenticated/career'
     | '/_authenticated/community'
+    | '/_authenticated/connect'
     | '/_authenticated/creator'
     | '/_authenticated/dashboard'
     | '/_authenticated/notifications'
@@ -296,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/community'
       fullPath: '/community'
       preLoaderRoute: typeof AuthenticatedCommunityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/connect': {
+      id: '/_authenticated/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof AuthenticatedConnectRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/creator': {
@@ -383,6 +402,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBuildRoute: typeof AuthenticatedBuildRoute
   AuthenticatedCareerRoute: typeof AuthenticatedCareerRoute
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
+  AuthenticatedConnectRoute: typeof AuthenticatedConnectRoute
   AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -401,6 +421,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBuildRoute: AuthenticatedBuildRoute,
   AuthenticatedCareerRoute: AuthenticatedCareerRoute,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
+  AuthenticatedConnectRoute: AuthenticatedConnectRoute,
   AuthenticatedCreatorRoute: AuthenticatedCreatorRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
