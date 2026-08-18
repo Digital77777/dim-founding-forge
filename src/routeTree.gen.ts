@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedBuildRouteImport } from './routes/_authenticated/build'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
@@ -36,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedBuildRoute = AuthenticatedBuildRouteImport.update({
+  id: '/build',
+  path: '/build',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCareerRoute = AuthenticatedCareerRouteImport.update({
   id: '/career',
@@ -93,6 +99,7 @@ const AuthenticatedToolsSlugRoute = AuthenticatedToolsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/creator': typeof AuthenticatedCreatorRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/creator': typeof AuthenticatedCreatorRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/build': typeof AuthenticatedBuildRoute
   '/_authenticated/career': typeof AuthenticatedCareerRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/creator': typeof AuthenticatedCreatorRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/build'
     | '/career'
     | '/community'
     | '/creator'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/build'
     | '/career'
     | '/community'
     | '/creator'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/build'
     | '/_authenticated/career'
     | '/_authenticated/community'
     | '/_authenticated/creator'
@@ -208,6 +220,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/build': {
+      id: '/_authenticated/build'
+      path: '/build'
+      fullPath: '/build'
+      preLoaderRoute: typeof AuthenticatedBuildRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/career': {
       id: '/_authenticated/career'
@@ -283,6 +302,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBuildRoute: typeof AuthenticatedBuildRoute
   AuthenticatedCareerRoute: typeof AuthenticatedCareerRoute
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
@@ -296,6 +316,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBuildRoute: AuthenticatedBuildRoute,
   AuthenticatedCareerRoute: AuthenticatedCareerRoute,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedCreatorRoute: AuthenticatedCreatorRoute,
