@@ -19,6 +19,7 @@ import { Route as AuthenticatedCommunityRouteImport } from './routes/_authentica
 import { Route as AuthenticatedConnectRouteImport } from './routes/_authenticated/connect'
 import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEliteBetaRouteImport } from './routes/_authenticated/elite-beta'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
@@ -79,6 +80,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEliteBetaRoute = AuthenticatedEliteBetaRouteImport.update({
+  id: '/elite-beta',
+  path: '/elite-beta',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
     id: '/notifications',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/connect': typeof AuthenticatedConnectRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/connect': typeof AuthenticatedConnectRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/connect': typeof AuthenticatedConnectRoute
   '/_authenticated/creator': typeof AuthenticatedCreatorRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/connect'
     | '/creator'
     | '/dashboard'
+    | '/elite-beta'
     | '/notifications'
     | '/onboarding'
     | '/portfolio'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/connect'
     | '/creator'
     | '/dashboard'
+    | '/elite-beta'
     | '/notifications'
     | '/onboarding'
     | '/portfolio'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/_authenticated/connect'
     | '/_authenticated/creator'
     | '/_authenticated/dashboard'
+    | '/_authenticated/elite-beta'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
     | '/_authenticated/portfolio'
@@ -331,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/elite-beta': {
+      id: '/_authenticated/elite-beta'
+      path: '/elite-beta'
+      fullPath: '/elite-beta'
+      preLoaderRoute: typeof AuthenticatedEliteBetaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
@@ -405,6 +424,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConnectRoute: typeof AuthenticatedConnectRoute
   AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEliteBetaRoute: typeof AuthenticatedEliteBetaRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
@@ -424,6 +444,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConnectRoute: AuthenticatedConnectRoute,
   AuthenticatedCreatorRoute: AuthenticatedCreatorRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEliteBetaRoute: AuthenticatedEliteBetaRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
