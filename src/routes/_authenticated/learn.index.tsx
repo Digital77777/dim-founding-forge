@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMember } from "@/hooks/use-member";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/learn")({
+export const Route = createFileRoute("/_authenticated/learn/")({
   head: () => ({
     meta: [
       { title: "Learning Hub — DIM Elite" },
