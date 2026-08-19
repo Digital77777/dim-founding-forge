@@ -111,6 +111,15 @@ export const NAV_GROUPS: { group: string; items: NavItem[] }[] = [
   },
 ];
 
+/** Sticky bottom bar: the five main features members use every day. */
+export const TAB_ITEMS: NavItem[] = [
+  { label: "Home", to: "/dashboard", icon: "house" },
+  { label: "Learning", to: "/learn", icon: "graduation-cap" },
+  { label: "AI Tools", to: "/tools", icon: "wrench" },
+  { label: "Build", to: "/build", icon: "hammer" },
+  { label: "Community", to: "/community", icon: "messages-square" },
+];
+
 export const TIERS = [
   {
     name: "Starter",
