@@ -32,10 +32,39 @@ export const Route = createFileRoute("/")({
 
 function LandingRoute() {
   const stats = Route.useLoaderData();
-  return <Landing stats={stats} />;
+  const navigate = useNavigate();
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active && session) {
+        setSignedIn(true);
+        navigate({ to: "/dashboard", replace: true });
+      }
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) {
+        setSignedIn(true);
+        navigate({ to: "/dashboard", replace: true });
+      }
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  return <Landing stats={stats} signedIn={signedIn} />;
 }
 
-function Landing({ stats }: { stats: { taken: number; remaining: number; cap: number } }) {
+function Landing({
+  stats,
+  signedIn = false,
+}: {
+  stats: { taken: number; remaining: number; cap: number };
+  signedIn?: boolean;
+}) {
   return (
     <main>
       <section className="relative overflow-hidden bg-elite text-ink-foreground">
