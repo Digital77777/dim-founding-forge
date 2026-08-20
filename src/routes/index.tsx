@@ -1,5 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Check, Crown } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import { getFoundingStats } from "@/lib/public.functions";
@@ -32,10 +35,39 @@ export const Route = createFileRoute("/")({
 
 function LandingRoute() {
   const stats = Route.useLoaderData();
-  return <Landing stats={stats} />;
+  const navigate = useNavigate();
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active && session) {
+        setSignedIn(true);
+        navigate({ to: "/dashboard", replace: true });
+      }
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) {
+        setSignedIn(true);
+        navigate({ to: "/dashboard", replace: true });
+      }
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  return <Landing stats={stats} signedIn={signedIn} />;
 }
 
-function Landing({ stats }: { stats: { taken: number; remaining: number; cap: number } }) {
+function Landing({
+  stats,
+  signedIn = false,
+}: {
+  stats: { taken: number; remaining: number; cap: number };
+  signedIn?: boolean;
+}) {
   return (
     <main>
       <section className="relative overflow-hidden bg-elite text-ink-foreground">
@@ -62,8 +94,8 @@ function Landing({ stats }: { stats: { taken: number; remaining: number; cap: nu
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button size="lg" asChild>
-              <Link to="/auth">
-                Become a founding member
+              <Link to={signedIn ? "/dashboard" : "/auth"}>
+                {signedIn ? "Enter the app" : "Become a founding member"}
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
             </Button>
