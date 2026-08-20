@@ -58,6 +58,8 @@ function LandingRoute() {
     };
   }, [navigate]);
 
+  if (signedIn) return <AuthLoading label="Taking you into DIM ELITE…" />;
+
   return <Landing stats={stats} signedIn={signedIn} />;
 }
 
