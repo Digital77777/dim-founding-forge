@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Crown } from "lucide-react";
+import { Crown, Info } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { AuthLoading } from "@/components/dim/AuthLoading";
 import { BETA_AVAILABILITY } from "@/lib/dim";
 
 const TITLE = "Join DIM ELITE — Founding 1,000 Beta";
@@ -15,6 +16,14 @@ const DESCRIPTION =
   "Create your DIM ELITE account and claim a founding member place in the Digital Intelligence Marketplace beta.";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
+  validateSearch: (search: Record<string, unknown>) => ({
+    reason: typeof search.reason === "string" ? search.reason : undefined,
+    redirect:
+      typeof search.redirect === "string" && search.redirect.startsWith("/")
+        ? search.redirect
+        : undefined,
+  }),
   head: () => ({
     meta: [
       { title: TITLE },
@@ -28,17 +37,32 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signup" | "signin">("signup");
+  const { reason, redirect } = Route.useSearch();
+  const expired = reason === "expired";
+  const target = redirect && redirect !== "/auth" ? redirect : "/dashboard";
+  const [mode, setMode] = useState<"signup" | "signin">(expired ? "signin" : "signup");
+  const [resolving, setResolving] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    let active = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
+      if (!active) return;
+      if (data.session) {
+        setRedirecting(true);
+        navigate({ to: target, replace: true });
+        return;
+      }
+      setResolving(false);
     });
-  }, [navigate]);
+    return () => {
+      active = false;
+    };
+  }, [navigate, target]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,7 +82,8 @@ function AuthPage() {
         return;
       }
       toast.success("Welcome to DIM ELITE.");
-      navigate({ to: "/dashboard" });
+      setRedirecting(true);
+      navigate({ to: target, replace: true });
       return;
     }
 
@@ -68,7 +93,8 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    navigate({ to: "/dashboard" });
+    setRedirecting(true);
+    navigate({ to: target, replace: true });
   }
 
   async function google() {
@@ -80,7 +106,16 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/dashboard" });
+    setRedirecting(true);
+    navigate({ to: target, replace: true });
+  }
+
+  if (redirecting || resolving) {
+    return (
+      <AuthLoading
+        label={redirecting ? "Signing you in…" : "Checking your session…"}
+      />
+    );
   }
 
   return (
@@ -118,6 +153,16 @@ function AuthPage() {
               ? "Create your account to receive a Founding Member number."
               : "Sign in to continue your DIM journey."}
           </p>
+
+          {expired ? (
+            <div className="mt-6 flex gap-3 rounded-2xl border border-border bg-muted/50 p-4 text-left">
+              <Info className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+              <p className="text-sm text-muted-foreground">
+                Your session expired, so we brought you here. Sign in and we'll take you straight
+                back to where you were.
+              </p>
+            </div>
+          ) : null}
 
           <form onSubmit={submit} className="mt-8 space-y-4">
             {mode === "signup" ? (
