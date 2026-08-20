@@ -94,8 +94,8 @@ function Landing({
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button size="lg" asChild>
-              <Link to="/auth">
-                Become a founding member
+              <Link to={signedIn ? "/dashboard" : "/auth"}>
+                {signedIn ? "Enter the app" : "Become a founding member"}
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
             </Button>
