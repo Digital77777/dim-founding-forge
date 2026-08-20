@@ -17,13 +17,18 @@ const DESCRIPTION =
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (search: Record<string, unknown>) => ({
-    reason: typeof search.reason === "string" ? search.reason : undefined,
-    redirect:
-      typeof search.redirect === "string" && search.redirect.startsWith("/")
-        ? search.redirect
-        : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): {
+    reason?: string;
+    redirect?: string;
+  } => {
+    const reason = typeof search['reason'] === "string" ? search['reason'] : undefined;
+    const raw = typeof search['redirect'] === "string" ? search['redirect'] : undefined;
+    const redirect = raw?.startsWith("/") ? raw : undefined;
+    return {
+      ...(reason ? { reason } : {}),
+      ...(redirect ? { redirect } : {}),
+    };
+  },
   head: () => ({
     meta: [
       { title: TITLE },
