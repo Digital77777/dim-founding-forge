@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Check, Crown } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { AuthLoading } from "@/components/dim/AuthLoading";
 import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,8 @@ function LandingRoute() {
       sub.subscription.unsubscribe();
     };
   }, [navigate]);
+
+  if (signedIn) return <AuthLoading label="Taking you into DIM ELITE…" />;
 
   return <Landing stats={stats} signedIn={signedIn} />;
 }
