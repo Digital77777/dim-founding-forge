@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+import { AppShell } from "@/components/dim/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { FoundingBadge, foundingLabel } from "@/components/dim/FoundingBadge";
@@ -61,7 +62,8 @@ function Dashboard() {
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
+    <AppShell>
+      <div className="mx-auto max-w-5xl">
       <div className="rounded-3xl bg-elite px-6 py-10 text-ink-foreground sm:px-10">
         <FoundingBadge number={membership?.founding_number ?? null} size="md" />
         <h1 className="mt-5 text-3xl font-bold sm:text-4xl">
@@ -125,6 +127,7 @@ function Dashboard() {
           </Button>
         </div>
       </section>
-    </main>
+      </div>
+    </AppShell>
   );
 }
