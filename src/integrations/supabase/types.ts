@@ -589,7 +589,10 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          media_path: string | null
+          media_type: string | null
           space_slug: string
+          tags: string[]
           title: string | null
           user_id: string
         }
@@ -597,7 +600,10 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          media_path?: string | null
+          media_type?: string | null
           space_slug: string
+          tags?: string[]
           title?: string | null
           user_id: string
         }
@@ -605,7 +611,10 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          media_path?: string | null
+          media_type?: string | null
           space_slug?: string
+          tags?: string[]
           title?: string | null
           user_id?: string
         }

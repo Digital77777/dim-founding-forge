@@ -1,12 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { Calendar, ImagePlus, Lightbulb, MessageCircle, Play, TrendingUp, Users, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/dim/AppShell";
-import { PageHeader } from "@/components/dim/PageHeader";
-import { FoundingBadge } from "@/components/dim/FoundingBadge";
+import {
+  MediaPostCard,
+  TextPostCard,
+  type CommunityPostRow,
+  type PostAuthor,
+  type PostComment,
+} from "@/components/dim/CommunityPost";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,14 +24,29 @@ export const Route = createFileRoute("/_authenticated/community")({
   component: Community,
 });
 
+const QUICK_LINKS = [
+  { icon: TrendingUp, label: "Progress", to: "/progress" as const },
+  { icon: MessageCircle, label: "Notifications", to: "/notifications" as const },
+  { icon: Calendar, label: "Events", to: "/events" as const },
+  { icon: Lightbulb, label: "AI Tools", to: "/tools" as const },
+  { icon: Users, label: "Members", to: "/connect" as const },
+];
+
+type Feed = "all" | "posts" | "media";
+
 function Community() {
   const { userId } = useMember();
   const queryClient = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+
   const [space, setSpace] = useState<string | null>(null);
+  const [feed, setFeed] = useState<Feed>("all");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [openComments, setOpenComments] = useState<string | null>(null);
-  const [comment, setComment] = useState("");
+  const [tags, setTags] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const data = useQuery({
     queryKey: ["community", space, userId],
@@ -39,7 +59,7 @@ function Community() {
         .limit(40);
       if (space) postQuery = postQuery.eq("space_slug", space);
       const postsRes = await postQuery;
-      const posts = postsRes.data ?? [];
+      const posts = (postsRes.data ?? []) as CommunityPostRow[];
       const ids = posts.map((p) => p.id);
       const authorIds = [...new Set(posts.map((p) => p.user_id))];
       const [likesRes, commentsRes, profilesRes, membersRes] = await Promise.all([
@@ -50,53 +70,117 @@ function Community() {
           ? supabase.from("comments").select("*").in("post_id", ids).order("created_at")
           : Promise.resolve({ data: [] }),
         authorIds.length
-          ? supabase.from("profiles").select("id, full_name, headline").in("id", authorIds)
+          ? supabase
+              .from("profiles")
+              .select("id, full_name, headline, avatar_url")
+              .in("id", authorIds)
           : Promise.resolve({ data: [] }),
         authorIds.length
           ? supabase.from("elite_members").select("user_id, founding_number").in("user_id", authorIds)
           : Promise.resolve({ data: [] }),
       ]);
+
+      const paths = posts.map((p) => p.media_path).filter((p): p is string => !!p);
+      const mediaUrls = new Map<string, string>();
+      if (paths.length) {
+        const signed = await supabase.storage
+          .from("community-media")
+          .createSignedUrls(paths, 60 * 60);
+        (signed.data ?? []).forEach((entry, i) => {
+          const path = paths[i];
+          if (path && entry.signedUrl) mediaUrls.set(path, entry.signedUrl);
+        });
+      }
+
+      const memberMap = new Map(
+        (membersRes.data ?? []).map((m) => [m.user_id, m.founding_number as number | null]),
+      );
+      const authors = new Map<string, PostAuthor>(
+        (profilesRes.data ?? []).map((p) => [
+          p.id,
+          {
+            full_name: p.full_name,
+            headline: p.headline,
+            avatar_url: p.avatar_url,
+            founding_number: memberMap.get(p.id) ?? null,
+          },
+        ]),
+      );
+
       return {
         spaces: spacesRes.data ?? [],
         posts,
         likes: (likesRes.data ?? []) as { post_id: string; user_id: string }[],
-        comments: (commentsRes.data ?? []) as {
-          id: string;
-          post_id: string;
-          user_id: string;
-          body: string;
-        }[],
-        profiles: new Map((profilesRes.data ?? []).map((p) => [p.id, p])),
-        members: new Map((membersRes.data ?? []).map((m) => [m.user_id, m.founding_number])),
+        comments: (commentsRes.data ?? []) as PostComment[],
+        authors,
+        mediaUrls,
       };
     },
   });
 
   const d = data.data;
 
+  function pickFile(f: File | null) {
+    if (preview) URL.revokeObjectURL(preview);
+    setFile(f);
+    setPreview(f ? URL.createObjectURL(f) : null);
+  }
+
   async function post() {
-    if (!userId || !body.trim()) return;
+    if (!userId || (!body.trim() && !file)) return;
     const target = space ?? d?.spaces[0]?.slug;
     if (!target) return;
-    const { error } = await supabase.from("posts").insert({
-      user_id: userId,
-      space_slug: target,
-      title: title.trim() || null,
-      body: body.trim(),
-    });
-    if (error) {
-      toast.error("Could not post that.");
-      return;
+    setBusy(true);
+    try {
+      let mediaPath: string | null = null;
+      let mediaType: "image" | "video" | null = null;
+      if (file) {
+        mediaType = file.type.startsWith("video/") ? "video" : "image";
+        const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+        const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+        const up = await supabase.storage
+          .from("community-media")
+          .upload(path, file, { contentType: file.type });
+        if (up.error) {
+          toast.error("Could not upload that file.");
+          return;
+        }
+        mediaPath = path;
+      }
+
+      const parsedTags = tags
+        .split(/[,\s]+/)
+        .map((t) => t.replace(/^#/, "").trim())
+        .filter(Boolean)
+        .slice(0, 5);
+
+      const { error } = await supabase.from("posts").insert({
+        user_id: userId,
+        space_slug: target,
+        title: title.trim() || null,
+        body: body.trim(),
+        media_path: mediaPath,
+        media_type: mediaType,
+        tags: parsedTags,
+      });
+      if (error) {
+        toast.error("Could not post that.");
+        return;
+      }
+      setTitle("");
+      setBody("");
+      setTags("");
+      pickFile(null);
+      const { count } = await supabase
+        .from("posts")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
+      if ((count ?? 0) >= 5) await awardAchievement(userId, "community_builder", "Community Builder");
+      await queryClient.invalidateQueries({ queryKey: ["community"] });
+      toast.success("Shared with the community.");
+    } finally {
+      setBusy(false);
     }
-    setTitle("");
-    setBody("");
-    const { count } = await supabase
-      .from("posts")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
-    if ((count ?? 0) >= 5) await awardAchievement(userId, "community_builder", "Community Builder");
-    await queryClient.invalidateQueries({ queryKey: ["community"] });
-    toast.success("Posted to the community.");
   }
 
   async function toggleLike(postId: string, liked: boolean) {
@@ -106,21 +190,63 @@ function Community() {
     await queryClient.invalidateQueries({ queryKey: ["community"] });
   }
 
-  async function addComment(postId: string) {
-    if (!userId || !comment.trim()) return;
-    await supabase.from("comments").insert({ post_id: postId, user_id: userId, body: comment.trim() });
-    setComment("");
+  async function addComment(postId: string, value: string) {
+    if (!userId || !value) return;
+    await supabase.from("comments").insert({ post_id: postId, user_id: userId, body: value });
     await queryClient.invalidateQueries({ queryKey: ["community"] });
   }
 
+  const visible = (d?.posts ?? []).filter((p) =>
+    feed === "all" ? true : feed === "media" ? !!p.media_path : !p.media_path,
+  );
+
   return (
     <AppShell>
-      <PageHeader
-        eyebrow="Connect"
-        title="Community"
-        description="Spaces for DIM Learn, Build, Earn, Creator and Career conversations. Founding members are marked everywhere they appear."
-      />
+      {/* Welcome hero */}
+      <section className="rounded-3xl border border-border bg-gradient-to-br from-primary/10 via-accent/10 to-background p-6 text-center">
+        <h1 className="font-display text-3xl font-extrabold leading-tight text-ember sm:text-4xl">
+          Welcome To Our AI Community
+        </h1>
+        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
+          Connect with founding members, share insights, post wins and reels, and grow together in
+          the world of artificial intelligence.
+        </p>
 
+        <div className="mt-5 space-y-2">
+          <Button
+            className="w-full bg-ember text-primary-foreground shadow-glow"
+            size="lg"
+            onClick={() => document.getElementById("composer")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            <ImagePlus className="mr-1 size-4" /> Create a post
+          </Button>
+          <Button asChild variant="secondary" size="lg" className="w-full">
+            <Link to="/events">
+              <Calendar className="mr-1 size-4" /> Browse events
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="lg" className="w-full bg-primary/5 text-primary">
+            <Link to="/notifications">
+              <MessageCircle className="mr-1 size-4" /> My inbox
+            </Link>
+          </Button>
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {QUICK_LINKS.map((q) => (
+            <Link
+              key={q.label}
+              to={q.to}
+              aria-label={q.label}
+              className="inline-flex size-12 items-center justify-center rounded-full border border-primary/25 bg-card text-primary transition hover:bg-primary/10"
+            >
+              <q.icon className="size-5" />
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Spaces */}
       <div className="mt-6 flex flex-wrap gap-2">
         <button
           onClick={() => setSpace(null)}
@@ -147,11 +273,12 @@ function Community() {
         ))}
       </div>
 
-      <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+      {/* Composer */}
+      <section id="composer" className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
         <h2 className="font-display text-lg font-bold">Share something</h2>
         <Input
           className="mt-3"
-          placeholder="Title (optional)"
+          placeholder="Headline (optional)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -162,75 +289,100 @@ function Community() {
           value={body}
           onChange={(e) => setBody(e.target.value)}
         />
-        <Button className="mt-3" onClick={post} disabled={!body.trim()}>
-          Post
-        </Button>
+        <Input
+          className="mt-3"
+          placeholder="Tags, e.g. ai-tools research"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+        />
+
+        {preview ? (
+          <div className="relative mt-3 overflow-hidden rounded-xl border border-border">
+            {file?.type.startsWith("video/") ? (
+              <video src={preview} controls className="max-h-72 w-full bg-ink object-contain" />
+            ) : (
+              <img src={preview} alt="Selected upload" className="max-h-72 w-full object-cover" />
+            )}
+            <button
+              type="button"
+              onClick={() => pickFile(null)}
+              aria-label="Remove attachment"
+              className="absolute right-2 top-2 rounded-full bg-ink/70 p-1.5 text-ink-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ) : null}
+
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*,video/*"
+          className="hidden"
+          onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+        />
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button variant="outline" onClick={() => fileRef.current?.click()}>
+            <ImagePlus className="mr-1 size-4" /> Photo
+          </Button>
+          <Button variant="outline" onClick={() => fileRef.current?.click()}>
+            <Play className="mr-1 size-4" /> Video
+          </Button>
+          <Button
+            className="ml-auto"
+            onClick={post}
+            disabled={busy || (!body.trim() && !file)}
+          >
+            {busy ? "Posting…" : "Post"}
+          </Button>
+        </div>
       </section>
 
-      <section className="mt-6 space-y-4">
-        {(d?.posts ?? []).map((p) => {
-          const likes = (d?.likes ?? []).filter((l) => l.post_id === p.id);
-          const liked = likes.some((l) => l.user_id === userId);
-          const comments = (d?.comments ?? []).filter((c) => c.post_id === p.id);
-          const author = d?.profiles.get(p.user_id);
-          const number = d?.members.get(p.user_id) ?? null;
-          return (
-            <article key={p.id} className="rounded-2xl border border-border bg-card p-5">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold">{author?.full_name ?? "DIM member"}</span>
-                <FoundingBadge number={number} />
-                <span className="ml-auto text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  {p.space_slug}
-                </span>
-              </div>
-              {p.title ? <h3 className="mt-3 font-display text-lg font-bold">{p.title}</h3> : null}
-              <p className="mt-2 whitespace-pre-line text-sm text-foreground/85">{p.body}</p>
-              <div className="mt-4 flex items-center gap-4 text-sm">
-                <button
-                  onClick={() => toggleLike(p.id, liked)}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 font-medium",
-                    liked ? "text-primary" : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  <Heart className={cn("size-4", liked && "fill-current")} /> {likes.length}
-                </button>
-                <button
-                  onClick={() => setOpenComments(openComments === p.id ? null : p.id)}
-                  className="inline-flex items-center gap-1.5 font-medium text-muted-foreground hover:text-foreground"
-                >
-                  <MessageSquare className="size-4" /> {comments.length}
-                </button>
-              </div>
+      {/* Feed filter */}
+      <div className="mt-6 grid grid-cols-3 gap-1 rounded-full bg-muted p-1">
+        {(
+          [
+            { key: "all", label: "All" },
+            { key: "posts", label: "Discussions" },
+            { key: "media", label: "Reels & photos" },
+          ] as { key: Feed; label: string }[]
+        ).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setFeed(t.key)}
+            className={cn(
+              "rounded-full py-2 text-sm font-semibold transition",
+              feed === t.key ? "bg-card text-primary shadow-sm" : "text-muted-foreground",
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
 
-              {openComments === p.id ? (
-                <div className="mt-4 space-y-3 border-t border-border pt-4">
-                  {comments.map((c) => (
-                    <div key={c.id} className="rounded-xl bg-muted/60 p-3 text-sm">
-                      <p className="text-xs font-semibold text-muted-foreground">
-                        {d?.profiles.get(c.user_id)?.full_name ?? "DIM member"}
-                      </p>
-                      <p className="mt-1">{c.body}</p>
-                    </div>
-                  ))}
-                  <div className="flex gap-2">
-                    <Input
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                      placeholder="Add a comment"
-                    />
-                    <Button onClick={() => addComment(p.id)} disabled={!comment.trim()}>
-                      Send
-                    </Button>
-                  </div>
-                </div>
-              ) : null}
-            </article>
+      <section className="mt-4 space-y-4">
+        {visible.map((p) => {
+          const likes = (d?.likes ?? []).filter((l) => l.post_id === p.id);
+          const props = {
+            post: p,
+            liked: likes.some((l) => l.user_id === userId),
+            likeCount: likes.length,
+            comments: (d?.comments ?? []).filter((c) => c.post_id === p.id),
+            authorFor: (id: string) => d?.authors.get(id),
+            onToggleLike: () => toggleLike(p.id, likes.some((l) => l.user_id === userId)),
+            onComment: (value: string) => addComment(p.id, value),
+            mediaUrl: p.media_path ? (d?.mediaUrls.get(p.media_path) ?? null) : null,
+          };
+          return p.media_path ? (
+            <MediaPostCard key={p.id} {...props} />
+          ) : (
+            <TextPostCard key={p.id} {...props} />
           );
         })}
-        {!data.isLoading && (d?.posts ?? []).length === 0 ? (
+        {!data.isLoading && visible.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No posts in this space yet — be the first founding member to start the conversation.
+            Nothing here yet — be the first founding member to start the conversation.
           </p>
         ) : null}
       </section>
