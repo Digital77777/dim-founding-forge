@@ -30,6 +30,7 @@ import { Route as AuthenticatedOpportunitiesRouteImport } from './routes/_authen
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
+import { Route as AuthenticatedReelsRouteImport } from './routes/_authenticated/reels'
 import { Route as AuthenticatedLearnIndexRouteImport } from './routes/_authenticated/learn.index'
 import { Route as AuthenticatedLearnCourseRouteImport } from './routes/_authenticated/learn.$course'
 import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
@@ -143,6 +144,11 @@ const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
   path: '/progress',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReelsRoute = AuthenticatedReelsRouteImport.update({
+  id: '/reels',
+  path: '/reels',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLearnIndexRoute = AuthenticatedLearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof AuthenticatedPortfolioRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/reels': typeof AuthenticatedReelsRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
   '/learn/': typeof AuthenticatedLearnIndexRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/portfolio': typeof AuthenticatedPortfolioRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/reels': typeof AuthenticatedReelsRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
   '/learn': typeof AuthenticatedLearnIndexRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
+  '/_authenticated/reels': typeof AuthenticatedReelsRoute
   '/_authenticated/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/_authenticated/tools/$slug': typeof AuthenticatedToolsSlugRoute
   '/_authenticated/learn/': typeof AuthenticatedLearnIndexRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/profile'
     | '/progress'
+    | '/reels'
     | '/learn/$course'
     | '/tools/$slug'
     | '/learn/'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/profile'
     | '/progress'
+    | '/reels'
     | '/learn/$course'
     | '/tools/$slug'
     | '/learn'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portfolio'
     | '/_authenticated/profile'
     | '/_authenticated/progress'
+    | '/_authenticated/reels'
     | '/_authenticated/learn/$course'
     | '/_authenticated/tools/$slug'
     | '/_authenticated/learn/'
@@ -482,6 +494,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgressRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reels': {
+      id: '/_authenticated/reels'
+      path: '/reels'
+      fullPath: '/reels'
+      preLoaderRoute: typeof AuthenticatedReelsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/learn/': {
       id: '/_authenticated/learn/'
       path: '/learn'
@@ -532,6 +551,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
+  AuthenticatedReelsRoute: typeof AuthenticatedReelsRoute
   AuthenticatedLearnCourseRoute: typeof AuthenticatedLearnCourseRoute
   AuthenticatedToolsSlugRoute: typeof AuthenticatedToolsSlugRoute
   AuthenticatedLearnIndexRoute: typeof AuthenticatedLearnIndexRoute
@@ -557,6 +577,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
+  AuthenticatedReelsRoute: AuthenticatedReelsRoute,
   AuthenticatedLearnCourseRoute: AuthenticatedLearnCourseRoute,
   AuthenticatedToolsSlugRoute: AuthenticatedToolsSlugRoute,
   AuthenticatedLearnIndexRoute: AuthenticatedLearnIndexRoute,
