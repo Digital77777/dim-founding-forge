@@ -74,6 +74,7 @@ export const NAV_GROUPS: { group: string; items: NavItem[] }[] = [
       { label: "Build", to: "/build", icon: "hammer" },
       { label: "AI Tools", to: "/tools", icon: "wrench" },
       { label: "Community", to: "/community", icon: "messages-square" },
+      { label: "Reels", to: "/reels", icon: "clapperboard" },
     ],
   },
   {
