@@ -22,7 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMember } from "@/hooks/use-member";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/reels")({
+export const Route = createFileRoute("/_authenticated/reels/")({
   validateSearch: z.object({ post: z.string().optional() }),
   component: Reels,
 });
