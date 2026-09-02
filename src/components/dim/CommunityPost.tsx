@@ -1,5 +1,16 @@
-import { Heart, MessageCircle, MoreHorizontal, Send, Bookmark, Eye } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import {
+  Bookmark,
+  Clapperboard,
+  Eye,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Play,
+  Send,
+} from "lucide-react";
 import { useState } from "react";
+
 
 import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
