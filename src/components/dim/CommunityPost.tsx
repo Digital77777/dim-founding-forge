@@ -1,5 +1,16 @@
-import { Heart, MessageCircle, MoreHorizontal, Send, Bookmark, Eye } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import {
+  Bookmark,
+  Clapperboard,
+  Eye,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Play,
+  Send,
+} from "lucide-react";
 import { useState } from "react";
+
 
 import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -260,35 +271,52 @@ export function MediaPostCard({
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
   return (
-    <article className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+    <article className="-mx-4 overflow-hidden border-y border-border bg-card shadow-sm sm:mx-0 sm:rounded-2xl sm:border">
       <div className="px-4 py-3">
         <AuthorRow author={h.authorFor(post.user_id)} post={post} compact />
       </div>
 
-      <div className="relative aspect-square w-full bg-ink">
+      <div className="relative w-full bg-ink">
         {mediaUrl ? (
           post.media_type === "video" ? (
-            <video
-              src={mediaUrl}
-              controls
-              playsInline
-              className="size-full object-contain"
-              aria-label={post.title ?? "Community video"}
-            />
+            <Link
+              to="/reels"
+              search={{ post: post.id }}
+              aria-label="Watch in Reels"
+              className="group relative block aspect-[4/5] w-full"
+            >
+              <video
+                src={mediaUrl}
+                muted
+                playsInline
+                preload="metadata"
+                className="size-full object-cover"
+              />
+              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
+              <span className="pointer-events-none absolute inset-0 grid place-items-center">
+                <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur transition group-hover:scale-105">
+                  <Play className="size-7 fill-current" />
+                </span>
+              </span>
+              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
+                <Clapperboard className="size-3.5" /> Reel
+              </span>
+            </Link>
           ) : (
             <img
               src={mediaUrl}
               alt={post.title ?? "Community post"}
               loading="lazy"
-              className="size-full object-cover"
+              className="aspect-[4/5] size-full object-cover"
             />
           )
         ) : (
-          <div className="flex size-full items-center justify-center text-sm text-ink-foreground/70">
+          <div className="flex aspect-[4/5] w-full items-center justify-center text-sm text-ink-foreground/70">
             Media unavailable
           </div>
         )}
       </div>
+
 
       <div className="flex items-center gap-4 px-4 pt-3">
         <button
