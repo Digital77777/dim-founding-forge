@@ -412,7 +412,7 @@ function ReelCard({
 
 function Reels() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/reels" });
+  const navigate = useNavigate({ from: "/reels/" });
   const { userId } = useMember();
   const queryClient = useQueryClient();
   const [muted, setMuted] = useState(true);
