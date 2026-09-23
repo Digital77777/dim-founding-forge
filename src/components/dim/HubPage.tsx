@@ -118,6 +118,6 @@ export function HubPage({
           Resources for this hub are being added as the beta progresses.
         </p>
       ) : null}
-    </AppShell>
+    </Shell>
   );
 }
