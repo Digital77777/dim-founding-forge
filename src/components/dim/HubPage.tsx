@@ -17,12 +17,15 @@ export function HubPage({
   title,
   description,
   question,
+  bare = false,
 }: {
   hub: string;
   eyebrow: string;
   title: string;
   description: string;
   question: string;
+  /** Render just the hub content, for embedding inside another page. */
+  bare?: boolean;
 }) {
   const data = useQuery({
     queryKey: ["hub", hub],
@@ -37,14 +40,23 @@ export function HubPage({
 
   const d = data.data;
   const categories = [...new Set((d?.resources ?? []).map((r) => r.category))];
+  const Shell = bare
+    ? ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+    : AppShell;
 
   return (
-    <AppShell>
-      <PageHeader eyebrow={eyebrow} title={title} description={description} />
+    <Shell>
+      {bare ? null : (
+        <>
+          <PageHeader eyebrow={eyebrow} title={title} description={description} />
 
-      <p className="mt-6 rounded-2xl border border-border bg-muted/50 p-5 font-display text-lg font-bold">
-        {question}
-      </p>
+          <p className="mt-6 rounded-2xl border border-border bg-muted/50 p-5 font-display text-lg font-bold">
+            {question}
+          </p>
+        </>
+      )}
+
+
 
       {(d?.courses ?? []).length > 0 ? (
         <section className="mt-8">
@@ -106,6 +118,6 @@ export function HubPage({
           Resources for this hub are being added as the beta progresses.
         </p>
       ) : null}
-    </AppShell>
+    </Shell>
   );
 }
