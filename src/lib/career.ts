@@ -27,7 +27,7 @@ export const CAREER_FEATURES: CareerFeature[] = [
       "Shows what to learn next",
       "Reduces career confusion",
     ],
-    cta: { label: "Explore Roadmap", to: "/progress" },
+    cta: { label: "Explore Roadmap", to: "/roadmap" },
   },
   {
     n: "02",
@@ -392,7 +392,7 @@ export const CAREER_AUDIENCES = [
     title: "Graduate",
     line: "Turn your education into career momentum.",
     items: ["Career roadmap", "CV", "Portfolio", "Interview prep", "Graduate opportunities"],
-    cta: { label: "Build My Path", to: "/progress" } as CareerLink,
+    cta: { label: "Build My Path", to: "/roadmap" } as CareerLink,
   },
   {
     title: "Early-Career Professional",

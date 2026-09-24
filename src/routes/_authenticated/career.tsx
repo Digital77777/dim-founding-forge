@@ -162,7 +162,7 @@ function Hero() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button size="lg" asChild>
-              <Link to="/progress">
+              <Link to="/roadmap">
                 Build My Career Path <ArrowRight className="size-4" aria-hidden />
               </Link>
             </Button>
@@ -325,7 +325,7 @@ function Roadmap() {
         ))}
       </ol>
       <div className="mt-6">
-        <Cta link={{ label: "Create My Roadmap", to: "/progress" }} variant="default" />
+        <Cta link={{ label: "Create My Roadmap", to: "/roadmap" }} variant="default" />
       </div>
     </section>
   );
