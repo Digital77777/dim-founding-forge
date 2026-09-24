@@ -547,10 +547,11 @@ function Reels() {
 
   const setFilters = useCallback(
     (patch: Partial<typeof search>) => {
-      void navigate({ search: (prev) => ({ ...prev, ...patch, post: undefined }) });
+      void navigate({ search: { ...search, ...patch, post: undefined } });
     },
-    [navigate],
+    [navigate, search],
   );
+
 
   async function toggleLike(postId: string, liked: boolean) {
     if (!userId) return;
