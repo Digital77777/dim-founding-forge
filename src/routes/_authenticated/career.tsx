@@ -325,7 +325,7 @@ function Roadmap() {
         ))}
       </ol>
       <div className="mt-6">
-        <Cta link={{ label: "Create My Roadmap", to: "/progress" }} variant="default" />
+        <Cta link={{ label: "Create My Roadmap", to: "/roadmap" }} variant="default" />
       </div>
     </section>
   );
