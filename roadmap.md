@@ -5,7 +5,7 @@
 - Learn / Tools / Build / Creator / Career hubs, Community hybrid feed (Facebook-style text, Instagram-style media)
 - Reels: full-screen vertical feed, Create Reel flow (device upload + YouTube link), tag/creator/search/following filters, next-video preloading
 
-## Next: DIM Career Hub experience (`/career`)
+## Done: DIM Career Hub experience (`/career`)
 Premium career-acceleration experience replacing the current Career hub page, reusing the existing route, AppShell, design tokens and auth.
 
 - Hero: "Turn Your AI Skills Into a Career." + animated GOAL → SKILLS → LEARNING → PROJECTS → PORTFOLIO → CERTIFICATIONS → PREPARATION → OPPORTUNITIES visual
