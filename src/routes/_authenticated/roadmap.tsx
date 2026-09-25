@@ -67,11 +67,11 @@ function RoadmapPage() {
 
   async function saveGoal(value: string) {
     const v = value.trim();
-    if (!userId || !v) return toast.error("Tell us the career you're aiming for.");
+    if (!userId || !v) { toast.error("Tell us the career you are aiming for."); return; }
     setSaving(true);
     const { error } = await supabase.from("profiles").update({ career_goal: v }).eq("id", userId);
     setSaving(false);
-    if (error) return toast.error("Couldn't save your goal. Please try again.");
+    if (error) { toast.error("Could not save your goal. Please try again."); return; }
     setGoal(v);
     invalidate();
     toast.success("Your roadmap is ready.");
