@@ -86,6 +86,69 @@ export type Database = {
         }
         Relationships: []
       }
+      career_milestones: {
+        Row: {
+          completed_at: string
+          id: string
+          milestone_key: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          milestone_key: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          milestone_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      career_plans: {
+        Row: {
+          created_at: string
+          experience_level: string | null
+          experience_summary: string | null
+          generated_at: string | null
+          interests: string[]
+          learning_path: string | null
+          portfolio_summary: string | null
+          roadmap: Json | null
+          target_role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          experience_level?: string | null
+          experience_summary?: string | null
+          generated_at?: string | null
+          interests?: string[]
+          learning_path?: string | null
+          portfolio_summary?: string | null
+          roadmap?: Json | null
+          target_role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          experience_level?: string | null
+          experience_summary?: string | null
+          generated_at?: string | null
+          interests?: string[]
+          learning_path?: string | null
+          portfolio_summary?: string | null
+          roadmap?: Json | null
+          target_role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coming_soon_interest: {
         Row: {
           created_at: string
