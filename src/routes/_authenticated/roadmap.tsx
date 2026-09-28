@@ -240,7 +240,7 @@ function RoadmapPage() {
   );
 }
 
-function GoalSetup({ userId, initial, onDone, onCancel }: { userId: string; initial: Plan | null; onDone: () => void; onCancel?: () => void }) {
+function GoalSetup({ userId, initial, onDone, onCancel }: { userId: string; initial: Plan | null; onDone: () => void; onCancel?: (() => void) | undefined }) {
   const [step, setStep] = useState(0);
   const [role, setRole] = useState("");
   const [level, setLevel] = useState("");

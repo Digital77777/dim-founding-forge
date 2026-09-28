@@ -19,3 +19,5 @@ Premium career-acceleration experience replacing the current Career hub page, re
 - DIM ecosystem tie-in (LEARN → BUILD → CONNECT → EARN → GROW), value proposition, "where are you on your journey?" personalization, final CTA
 - Keep existing hub content (career courses + resource shelves) reachable
 - Rules: zero dead buttons, no fabricated functionality or outcomes, SEO title/description + single H1, accessible + responsive, no navigation-triggered error boundary
+
+- [x] Career goal setup, AI roadmap (Lovable AI) and milestone tracking at /roadmap
