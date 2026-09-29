@@ -34,6 +34,12 @@ const QUICK_LINKS = [
 
 type Feed = "all" | "posts" | "media";
 
+const FEED_OPTIONS: { key: Feed; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "posts", label: "Discussions" },
+  { key: "media", label: "Reels & photos" },
+];
+
 function Community() {
   const { userId } = useMember();
   const queryClient = useQueryClient();
@@ -200,8 +206,56 @@ function Community() {
     feed === "all" ? true : feed === "media" ? !!p.media_path : !p.media_path,
   );
 
+  const communityScrollHeader = (
+    <div className="mx-auto max-w-7xl px-3 py-2">
+      <div
+        className="flex snap-x snap-mandatory gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label="Community content filters"
+      >
+        {FEED_OPTIONS.map((option) => (
+          <Button
+            key={option.key}
+            type="button"
+            size="sm"
+            variant={feed === option.key ? "default" : "ghost"}
+            onClick={() => setFeed(option.key)}
+            className="shrink-0 snap-start"
+          >
+            {option.label}
+          </Button>
+        ))}
+      </div>
+      <div
+        className="mt-1 flex snap-x snap-mandatory gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label="Community spaces"
+      >
+        <Button
+          type="button"
+          size="sm"
+          variant={!space ? "secondary" : "outline"}
+          onClick={() => setSpace(null)}
+          className="shrink-0 snap-start rounded-full"
+        >
+          All spaces
+        </Button>
+        {(d?.spaces ?? []).map((communitySpace) => (
+          <Button
+            key={communitySpace.slug}
+            type="button"
+            size="sm"
+            variant={space === communitySpace.slug ? "secondary" : "outline"}
+            onClick={() => setSpace(communitySpace.slug)}
+            className="shrink-0 snap-start rounded-full"
+          >
+            {communitySpace.name}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-    <AppShell>
+    <AppShell scrollHeader={communityScrollHeader}>
       {/* Welcome hero */}
       <section className="rounded-3xl border border-border bg-gradient-to-br from-primary/10 via-accent/10 to-background p-6 text-center">
         <h1 className="font-display text-3xl font-extrabold leading-tight text-ember sm:text-4xl">
@@ -342,11 +396,7 @@ function Community() {
       {/* Feed filter */}
       <div className="mt-6 grid grid-cols-3 gap-1 rounded-full bg-muted p-1">
         {(
-          [
-            { key: "all", label: "All" },
-            { key: "posts", label: "Discussions" },
-            { key: "media", label: "Reels & photos" },
-          ] as { key: Feed; label: string }[]
+          FEED_OPTIONS
         ).map((t) => (
           <button
             key={t.key}
