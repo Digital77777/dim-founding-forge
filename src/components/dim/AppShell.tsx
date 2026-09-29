@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, ChevronLeft, ChevronRight, LogOut, Menu, Settings, UserRound, X } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Bell, ChevronRight, LogOut, Menu, Settings, UserRound, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/dim/Icon";
@@ -10,92 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMember, firstName } from "@/hooks/use-member";
 import { NAV_GROUPS, TAB_ITEMS } from "@/lib/dim";
 import { cn } from "@/lib/utils";
-
-const FEATURE_ITEMS = NAV_GROUPS.flatMap((group) => group.items).filter(
-  (item, index, items) => items.findIndex((candidate) => candidate.to === item.to) === index,
-);
-
-function FeatureRail({ visible }: { visible: boolean }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const railRef = useRef<HTMLDivElement>(null);
-
-  function move(direction: -1 | 1) {
-    railRef.current?.scrollBy({ left: direction * 420, behavior: "smooth" });
-  }
-
-  return (
-    <div
-      aria-hidden={!visible}
-      className={cn(
-        "grid overflow-hidden border-t border-border bg-background/95 shadow-sm transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none",
-        visible ? "grid-rows-[1fr] opacity-100" : "pointer-events-none grid-rows-[0fr] opacity-0",
-      )}
-    >
-      <div className="min-h-0">
-        <div className="relative mx-auto max-w-7xl">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => move(-1)}
-            className="absolute left-1 top-1/2 z-10 hidden -translate-y-1/2 bg-background/90 shadow-sm lg:inline-flex"
-            aria-label="Scroll features left"
-            tabIndex={visible ? 0 : -1}
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
-
-          <div
-            ref={railRef}
-            className="flex snap-x snap-mandatory gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:px-12"
-            aria-label="DIM features"
-          >
-            {FEATURE_ITEMS.map((item) => {
-              const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  tabIndex={visible ? 0 : -1}
-                  className={cn(
-                    "group relative flex min-w-[84px] snap-start flex-col items-center gap-1 rounded-lg px-2 py-1.5 text-center transition-colors",
-                    active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                  )}
-                >
-                  <Icon name={item.icon} className="size-5 shrink-0" />
-                  <span className="max-w-[96px] truncate text-[11px] font-semibold">{item.label}</span>
-                  {item.soon ? (
-                    <span className="absolute right-1 top-1 size-1.5 rounded-full bg-accent" aria-label="Coming soon" />
-                  ) : null}
-                  <span
-                    className={cn(
-                      "absolute inset-x-3 bottom-0 h-0.5 origin-center rounded-full bg-primary transition-transform duration-200 motion-reduce:transition-none",
-                      active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
-                    )}
-                  />
-                </Link>
-              );
-            })}
-          </div>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => move(1)}
-            className="absolute right-1 top-1/2 z-10 hidden -translate-y-1/2 bg-background/90 shadow-sm lg:inline-flex"
-            aria-label="Scroll features right"
-            tabIndex={visible ? 0 : -1}
-          >
-            <ChevronRight className="size-4" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -233,7 +147,13 @@ function MenuSheet({
 }
 
 /** The Elite app shell: sticky header, Facebook-style menu, sticky feature footer. */
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  scrollHeader,
+}: {
+  children: ReactNode;
+  scrollHeader?: ReactNode;
+}) {
   const { user, userId, profile, membership } = useMember();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -246,13 +166,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     function updateFeatureRail() {
-      setShowFeatureRail(window.scrollY > 96);
+      setShowFeatureRail(Boolean(scrollHeader) && window.scrollY > 160);
     }
 
     updateFeatureRail();
     window.addEventListener("scroll", updateFeatureRail, { passive: true });
     return () => window.removeEventListener("scroll", updateFeatureRail);
-  }, []);
+  }, [scrollHeader]);
 
   const unread = useQuery({
     queryKey: ["unread-notifications", userId],
@@ -318,7 +238,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Button>
           </div>
         </div>
-        <FeatureRail visible={showFeatureRail} />
+        {scrollHeader ? (
+          <div
+            aria-hidden={!showFeatureRail}
+            className={cn(
+              "grid overflow-hidden border-t border-border bg-background/95 shadow-sm transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none",
+              showFeatureRail
+                ? "grid-rows-[1fr] opacity-100"
+                : "pointer-events-none grid-rows-[0fr] opacity-0",
+            )}
+          >
+            <div className="min-h-0">{scrollHeader}</div>
+          </div>
+        ) : null}
       </header>
 
       <div className="mx-auto flex max-w-7xl">
