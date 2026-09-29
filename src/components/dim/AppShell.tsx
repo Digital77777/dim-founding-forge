@@ -258,6 +258,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     queryKey: ["unread-notifications", userId],
     enabled: !!userId,
     queryFn: async () => {
+      if (!userId) return 0;
       const { count } = await supabase
         .from("notifications")
         .select("id", { count: "exact", head: true })
