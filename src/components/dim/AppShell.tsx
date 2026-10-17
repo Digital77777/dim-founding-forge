@@ -241,6 +241,7 @@ export function AppShell({
         {scrollHeader ? (
           <div
             aria-hidden={!showFeatureRail}
+            inert={!showFeatureRail}
             className={cn(
               "grid overflow-hidden border-t border-border bg-background/95 shadow-sm transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none",
               showFeatureRail

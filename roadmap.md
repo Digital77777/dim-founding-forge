@@ -21,3 +21,4 @@ Premium career-acceleration experience replacing the current Career hub page, re
 - Rules: zero dead buttons, no fabricated functionality or outcomes, SEO title/description + single H1, accessible + responsive, no navigation-triggered error boundary
 
 - [x] Career goal setup, AI roadmap (Lovable AI) and milestone tracking at /roadmap
+- [x] Replace global scrolling navigation with Community-only feed filters, space filters and Community shortcuts beneath the sticky header.
