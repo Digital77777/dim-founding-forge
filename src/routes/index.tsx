@@ -44,13 +44,13 @@ function LandingRoute() {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (active && session) {
         setSignedIn(true);
-        navigate({ to: "/dashboard", replace: true });
+        navigate({ to: "/community", replace: true });
       }
     });
     supabase.auth.getSession().then(({ data }) => {
       if (active && data.session) {
         setSignedIn(true);
-        navigate({ to: "/dashboard", replace: true });
+        navigate({ to: "/community", replace: true });
       }
     });
     return () => {
@@ -97,7 +97,7 @@ function Landing({
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button size="lg" asChild>
-              <Link to={signedIn ? "/dashboard" : "/auth"}>
+              <Link to={signedIn ? "/community" : "/auth"}>
                 {signedIn ? "Enter the app" : "Become a founding member"}
                 <ArrowRight className="size-4" aria-hidden />
               </Link>

@@ -243,7 +243,7 @@ export function AppShell({
             aria-hidden={!showFeatureRail}
             inert={!showFeatureRail}
             className={cn(
-              "grid overflow-hidden border-t border-border bg-background/95 shadow-sm transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none",
+              "grid overflow-hidden border-t border-border bg-background/95 shadow-sm transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none",
               showFeatureRail
                 ? "grid-rows-[1fr] opacity-100"
                 : "pointer-events-none grid-rows-[0fr] opacity-0",

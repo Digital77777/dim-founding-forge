@@ -44,7 +44,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const { reason, redirect } = Route.useSearch();
   const expired = reason === "expired";
-  const target = redirect && redirect !== "/auth" ? redirect : "/dashboard";
+  const target = redirect && redirect !== "/auth" ? redirect : "/community";
   const [mode, setMode] = useState<"signup" | "signin">(expired ? "signin" : "signup");
   const [resolving, setResolving] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
@@ -78,7 +78,7 @@ function AuthPage() {
         password,
         options: {
           data: { full_name: fullName },
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/community`,
         },
       });
       setBusy(false);

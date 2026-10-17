@@ -74,7 +74,7 @@ function Onboarding() {
       .eq("id", userId);
     await invalidateMember();
     setSaving(false);
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/community" });
   }
 
   const steps = [
