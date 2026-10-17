@@ -22,3 +22,4 @@ Premium career-acceleration experience replacing the current Career hub page, re
 
 - [x] Career goal setup, AI roadmap (Lovable AI) and milestone tracking at /roadmap
 - [x] Replace global scrolling navigation with Community-only feed filters, space filters and Community shortcuts beneath the sticky header.
+- [x] Sticky footer tabs: Community (first, since it is the sign-in home page) replaces Home; Marketplace added; order Community / Learning / AI Tools / Build / Marketplace.
