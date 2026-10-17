@@ -216,30 +216,18 @@ function Community() {
     feed === "all" ? true : feed === "media" ? !!p.media_path : !p.media_path,
   );
 
+  const railChip =
+    "inline-flex h-10 shrink-0 snap-start items-center gap-2 rounded-full border border-primary/20 bg-card px-4 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none";
+
   const communityScrollHeader = (
-    <div className="mx-auto max-w-7xl px-3 py-2">
+    <div className="mx-auto max-w-7xl py-2.5">
       <div
-        className="flex snap-x snap-mandatory gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        aria-label="Community content filters"
+        className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label="Community features"
       >
-        {FEED_OPTIONS.map((option) => (
-          <Button
-            key={option.key}
-            type="button"
-            size="sm"
-            variant={feed === option.key ? "default" : "ghost"}
-            onClick={() => setFeed(option.key)}
-            className="shrink-0 snap-start"
-          >
-            {option.label}
-          </Button>
-        ))}
-        <span className="mx-1 w-px shrink-0 bg-border" />
-        <Button
+        <button
           type="button"
-          size="sm"
-          variant="ghost"
-          className="shrink-0 snap-start"
+          className={cn(railChip, "border-transparent bg-ember text-primary-foreground shadow-glow hover:bg-ember")}
           onClick={() => {
             document.getElementById("composer")?.scrollIntoView({
               behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
@@ -248,44 +236,19 @@ function Community() {
           }}
         >
           <ImagePlus className="size-4" /> Create a post
-        </Button>
-        <Button size="sm" variant="ghost" asChild className="shrink-0 snap-start">
-          <Link to="/events"><Calendar className="size-4" /> Browse events</Link>
-        </Button>
-        <Button size="sm" variant="ghost" asChild className="shrink-0 snap-start">
-          <Link to="/notifications"><MessageCircle className="size-4" /> My inbox</Link>
-        </Button>
-        {QUICK_LINKS.filter((item) => item.to !== "/events" && item.to !== "/notifications").map((item) => (
-          <Button key={item.label} size="sm" variant="ghost" asChild className="shrink-0 snap-start">
-            <Link to={item.to}><item.icon className="size-4" /> {item.label}</Link>
-          </Button>
+        </button>
+        <Link to="/events" className={railChip}>
+          <Calendar className="size-4 text-primary" /> Browse events
+        </Link>
+        <Link to="/notifications" className={railChip}>
+          <MessageCircle className="size-4 text-primary" /> My inbox
+        </Link>
+        {QUICK_LINKS.map((item) => (
+          <Link key={item.label} to={item.to} className={railChip}>
+            <item.icon className="size-4 text-primary" /> {item.label}
+          </Link>
         ))}
-      </div>
-      <div
-        className="mt-1 flex snap-x snap-mandatory gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        aria-label="Community spaces"
-      >
-        <Button
-          type="button"
-          size="sm"
-          variant={!space ? "secondary" : "outline"}
-          onClick={() => setSpace(null)}
-          className="shrink-0 snap-start rounded-full"
-        >
-          All spaces
-        </Button>
-        {(d?.spaces ?? []).map((communitySpace) => (
-          <Button
-            key={communitySpace.slug}
-            type="button"
-            size="sm"
-            variant={space === communitySpace.slug ? "secondary" : "outline"}
-            onClick={() => setSpace(communitySpace.slug)}
-            className="shrink-0 snap-start rounded-full"
-          >
-            {communitySpace.name}
-          </Button>
-        ))}
+        <span className="w-1 shrink-0" aria-hidden />
       </div>
     </div>
   );
