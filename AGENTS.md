@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- AppShell accepts page-owned scrollHeader controls; keep Community filters tied to its local feed/space state rather than duplicating global navigation.

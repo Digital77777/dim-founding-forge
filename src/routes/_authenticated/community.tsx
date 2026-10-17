@@ -21,6 +21,16 @@ import { awardAchievement } from "@/lib/member-actions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/community")({
+  head: () => ({
+    meta: [
+      { title: "DIM Community | Discussions, Reels & Member Spaces" },
+      { name: "description", content: "Connect with DIM members, explore community spaces, and share discussions, photos and reels." },
+      { property: "og:title", content: "DIM Community | Discussions, Reels & Member Spaces" },
+      { property: "og:description", content: "Connect with DIM members, explore community spaces, and share discussions, photos and reels." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Community,
 });
 
@@ -222,6 +232,32 @@ function Community() {
             className="shrink-0 snap-start"
           >
             {option.label}
+          </Button>
+        ))}
+        <span className="mx-1 w-px shrink-0 bg-border" />
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          className="shrink-0 snap-start"
+          onClick={() => {
+            document.getElementById("composer")?.scrollIntoView({
+              behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+              block: "center",
+            });
+          }}
+        >
+          <ImagePlus className="size-4" /> Create a post
+        </Button>
+        <Button size="sm" variant="ghost" asChild className="shrink-0 snap-start">
+          <Link to="/events"><Calendar className="size-4" /> Browse events</Link>
+        </Button>
+        <Button size="sm" variant="ghost" asChild className="shrink-0 snap-start">
+          <Link to="/notifications"><MessageCircle className="size-4" /> My inbox</Link>
+        </Button>
+        {QUICK_LINKS.filter((item) => item.to !== "/events" && item.to !== "/notifications").map((item) => (
+          <Button key={item.label} size="sm" variant="ghost" asChild className="shrink-0 snap-start">
+            <Link to={item.to}><item.icon className="size-4" /> {item.label}</Link>
           </Button>
         ))}
       </div>
