@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useMember } from "@/hooks/use-member";
 import { awardAchievement } from "@/lib/member-actions";
@@ -36,8 +37,6 @@ export const Route = createFileRoute("/_authenticated/community")({
 
 const QUICK_LINKS = [
   { icon: TrendingUp, label: "Progress", to: "/progress" as const },
-  { icon: MessageCircle, label: "Notifications", to: "/notifications" as const },
-  { icon: Calendar, label: "Events", to: "/events" as const },
   { icon: Lightbulb, label: "AI Tools", to: "/tools" as const },
   
 ];
@@ -63,6 +62,7 @@ function Community() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(false);
 
   const data = useQuery({
     queryKey: ["community", space, userId],
@@ -193,6 +193,7 @@ function Community() {
         .eq("user_id", userId);
       if ((count ?? 0) >= 5) await awardAchievement(userId, "community_builder", "Community Builder");
       await queryClient.invalidateQueries({ queryKey: ["community"] });
+      setComposerOpen(false);
       toast.success("Shared with the community.");
     } finally {
       setBusy(false);
@@ -240,10 +241,16 @@ function Community() {
         <button
           type="button"
           className={cn(railChip, "border-transparent bg-ember text-primary-foreground shadow-glow hover:bg-ember")}
-          onClick={() => scrollTo("composer")}
+          onClick={() => setComposerOpen(true)}
         >
           <ImagePlus className="size-4" /> Create a post
         </button>
+        <Link to="/events" className={railChip}>
+          <Calendar className="size-4 text-primary" /> Browse events
+        </Link>
+        <Link to="/notifications" className={railChip}>
+          <MessageCircle className="size-4 text-primary" /> My inbox
+        </Link>
         <button
           type="button"
           aria-pressed={feed === "mine"}
@@ -257,12 +264,6 @@ function Community() {
         </button>
         <Link to="/connect" className={railChip}>
           <UserSearch className="size-4 text-primary" /> Find members
-        </Link>
-        <Link to="/events" className={railChip}>
-          <Calendar className="size-4 text-primary" /> Browse events
-        </Link>
-        <Link to="/notifications" className={railChip}>
-          <MessageCircle className="size-4 text-primary" /> My inbox
         </Link>
         {QUICK_LINKS.map((item) => (
           <Link key={item.label} to={item.to} className={railChip}>
@@ -308,9 +309,13 @@ function Community() {
         ))}
       </div>
 
-      {/* Composer */}
-      <section id="composer" className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <h2 className="font-display text-lg font-bold">Share something</h2>
+      {/* Composer (opened from "Create a post") */}
+      <Sheet open={composerOpen} onOpenChange={setComposerOpen}>
+        <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto rounded-t-3xl pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+        <SheetHeader className="text-left">
+          <SheetTitle className="font-display">Create a post</SheetTitle>
+          <SheetDescription>Share what you're learning, building or figuring out.</SheetDescription>
+        </SheetHeader>
         <Input
           className="mt-3"
           placeholder="Headline (optional)"
@@ -372,7 +377,8 @@ function Community() {
             {busy ? "Posting…" : "Post"}
           </Button>
         </div>
-      </section>
+        </SheetContent>
+      </Sheet>
 
       {/* Feed filter */}
       <div id="feed" className="mt-6 grid scroll-mt-32 grid-cols-3 gap-1 rounded-full bg-muted p-1">
