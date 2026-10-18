@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Calendar, ImagePlus, Lightbulb, MessageCircle, Play, TrendingUp, Users, X } from "lucide-react";
+import { Activity, Calendar, ImagePlus, Lightbulb, MessageCircle, Play, TrendingUp, Users, UserSearch, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -39,10 +39,10 @@ const QUICK_LINKS = [
   { icon: MessageCircle, label: "Notifications", to: "/notifications" as const },
   { icon: Calendar, label: "Events", to: "/events" as const },
   { icon: Lightbulb, label: "AI Tools", to: "/tools" as const },
-  { icon: Users, label: "Members", to: "/connect" as const },
+  
 ];
 
-type Feed = "all" | "posts" | "media";
+type Feed = "all" | "posts" | "media" | "mine";
 
 const FEED_OPTIONS: { key: Feed; label: string }[] = [
   { key: "all", label: "All" },
