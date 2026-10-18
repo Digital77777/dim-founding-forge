@@ -240,10 +240,16 @@ function Community() {
         <button
           type="button"
           className={cn(railChip, "border-transparent bg-ember text-primary-foreground shadow-glow hover:bg-ember")}
-          onClick={() => scrollTo("composer")}
+          onClick={() => setComposerOpen(true)}
         >
           <ImagePlus className="size-4" /> Create a post
         </button>
+        <Link to="/events" className={railChip}>
+          <Calendar className="size-4 text-primary" /> Browse events
+        </Link>
+        <Link to="/notifications" className={railChip}>
+          <MessageCircle className="size-4 text-primary" /> My inbox
+        </Link>
         <button
           type="button"
           aria-pressed={feed === "mine"}
@@ -257,12 +263,6 @@ function Community() {
         </button>
         <Link to="/connect" className={railChip}>
           <UserSearch className="size-4 text-primary" /> Find members
-        </Link>
-        <Link to="/events" className={railChip}>
-          <Calendar className="size-4 text-primary" /> Browse events
-        </Link>
-        <Link to="/notifications" className={railChip}>
-          <MessageCircle className="size-4 text-primary" /> My inbox
         </Link>
         {QUICK_LINKS.map((item) => (
           <Link key={item.label} to={item.to} className={railChip}>
