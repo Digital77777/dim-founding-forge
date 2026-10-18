@@ -375,7 +375,7 @@ function Community() {
       </section>
 
       {/* Feed filter */}
-      <div className="mt-6 grid grid-cols-3 gap-1 rounded-full bg-muted p-1">
+      <div id="feed" className="mt-6 grid scroll-mt-32 grid-cols-3 gap-1 rounded-full bg-muted p-1">
         {(
           FEED_OPTIONS
         ).map((t) => (
