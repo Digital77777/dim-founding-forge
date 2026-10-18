@@ -166,7 +166,7 @@ export function AppShell({
 
   useEffect(() => {
     function updateFeatureRail() {
-      setShowFeatureRail(Boolean(scrollHeader) && window.scrollY > 160);
+      setShowFeatureRail(Boolean(scrollHeader));
     }
 
     updateFeatureRail();

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Calendar, ImagePlus, Lightbulb, MessageCircle, Play, TrendingUp, Users, X } from "lucide-react";
+import { Activity, Calendar, ImagePlus, Lightbulb, MessageCircle, Play, TrendingUp, Users, UserSearch, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -39,10 +39,10 @@ const QUICK_LINKS = [
   { icon: MessageCircle, label: "Notifications", to: "/notifications" as const },
   { icon: Calendar, label: "Events", to: "/events" as const },
   { icon: Lightbulb, label: "AI Tools", to: "/tools" as const },
-  { icon: Users, label: "Members", to: "/connect" as const },
+  
 ];
 
-type Feed = "all" | "posts" | "media";
+type Feed = "all" | "posts" | "media" | "mine";
 
 const FEED_OPTIONS: { key: Feed; label: string }[] = [
   { key: "all", label: "All" },
@@ -213,11 +213,23 @@ function Community() {
   }
 
   const visible = (d?.posts ?? []).filter((p) =>
-    feed === "all" ? true : feed === "media" ? !!p.media_path : !p.media_path,
+    feed === "all"
+      ? true
+      : feed === "mine"
+        ? p.user_id === userId
+        : feed === "media"
+          ? !!p.media_path
+          : !p.media_path,
   );
 
   const railChip =
     "inline-flex h-10 shrink-0 snap-start items-center gap-2 rounded-full border border-primary/20 bg-card px-4 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none";
+
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      block: "start",
+    });
 
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
@@ -228,15 +240,24 @@ function Community() {
         <button
           type="button"
           className={cn(railChip, "border-transparent bg-ember text-primary-foreground shadow-glow hover:bg-ember")}
-          onClick={() => {
-            document.getElementById("composer")?.scrollIntoView({
-              behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
-              block: "center",
-            });
-          }}
+          onClick={() => scrollTo("composer")}
         >
           <ImagePlus className="size-4" /> Create a post
         </button>
+        <button
+          type="button"
+          aria-pressed={feed === "mine"}
+          className={cn(railChip, feed === "mine" && "border-primary bg-primary/10 text-primary")}
+          onClick={() => {
+            setFeed(feed === "mine" ? "all" : "mine");
+            scrollTo("feed");
+          }}
+        >
+          <Activity className="size-4 text-primary" /> My activity
+        </button>
+        <Link to="/connect" className={railChip}>
+          <UserSearch className="size-4 text-primary" /> Find members
+        </Link>
         <Link to="/events" className={railChip}>
           <Calendar className="size-4 text-primary" /> Browse events
         </Link>
@@ -253,74 +274,35 @@ function Community() {
     </div>
   );
 
+  const spacePill = (active: boolean) =>
+    cn(
+      "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors",
+      active
+        ? "border-transparent bg-primary text-primary-foreground shadow-sm"
+        : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+    );
+
   return (
     <AppShell scrollHeader={communityScrollHeader}>
-      {/* Welcome hero */}
-      <section className="rounded-3xl border border-border bg-gradient-to-br from-primary/10 via-accent/10 to-background p-6 text-center">
-        <h1 className="font-display text-3xl font-extrabold leading-tight text-ember sm:text-4xl">
-          Welcome To Our AI Community
-        </h1>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-          Connect with founding members, share insights, post wins and reels, and grow together in
-          the world of artificial intelligence.
-        </p>
-
-        <div className="mt-5 space-y-2">
-          <Button
-            className="w-full bg-ember text-primary-foreground shadow-glow"
-            size="lg"
-            onClick={() => document.getElementById("composer")?.scrollIntoView({ behavior: "smooth" })}
-          >
-            <ImagePlus className="mr-1 size-4" /> Create a post
-          </Button>
-          <Button asChild variant="secondary" size="lg" className="w-full">
-            <Link to="/events">
-              <Calendar className="mr-1 size-4" /> Browse events
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" size="lg" className="w-full bg-primary/5 text-primary">
-            <Link to="/notifications">
-              <MessageCircle className="mr-1 size-4" /> My inbox
-            </Link>
-          </Button>
+      <header className="flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">DIM Community</p>
+          <h1 className="mt-1 font-display text-2xl font-extrabold leading-tight sm:text-3xl">
+            {feed === "mine" ? "My activity" : "Community feed"}
+          </h1>
         </div>
-
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-          {QUICK_LINKS.map((q) => (
-            <Link
-              key={q.label}
-              to={q.to}
-              aria-label={q.label}
-              className="inline-flex size-12 items-center justify-center rounded-full border border-primary/25 bg-card text-primary transition hover:bg-primary/10"
-            >
-              <q.icon className="size-5" />
-            </Link>
-          ))}
-        </div>
-      </section>
+      </header>
 
       {/* Spaces */}
-      <div className="mt-6 flex flex-wrap gap-2">
-        <button
-          onClick={() => setSpace(null)}
-          className={cn(
-            "rounded-full border px-4 py-2 text-sm font-medium",
-            !space ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-muted",
-          )}
-        >
+      <div
+        className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label="Community spaces"
+      >
+        <button onClick={() => setSpace(null)} className={spacePill(!space)}>
           All spaces
         </button>
         {(d?.spaces ?? []).map((s) => (
-          <button
-            key={s.slug}
-            onClick={() => setSpace(s.slug)}
-            className={cn(
-              "rounded-full border px-4 py-2 text-sm font-medium",
-              space === s.slug
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border hover:bg-muted",
-            )}
-          >
+          <button key={s.slug} onClick={() => setSpace(s.slug)} className={spacePill(space === s.slug)}>
             {s.name}
           </button>
         ))}
@@ -393,7 +375,7 @@ function Community() {
       </section>
 
       {/* Feed filter */}
-      <div className="mt-6 grid grid-cols-3 gap-1 rounded-full bg-muted p-1">
+      <div id="feed" className="mt-6 grid scroll-mt-32 grid-cols-3 gap-1 rounded-full bg-muted p-1">
         {(
           FEED_OPTIONS
         ).map((t) => (
