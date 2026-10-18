@@ -308,9 +308,13 @@ function Community() {
         ))}
       </div>
 
-      {/* Composer */}
-      <section id="composer" className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <h2 className="font-display text-lg font-bold">Share something</h2>
+      {/* Composer (opened from "Create a post") */}
+      <Sheet open={composerOpen} onOpenChange={setComposerOpen}>
+        <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto rounded-t-3xl pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+        <SheetHeader className="text-left">
+          <SheetTitle className="font-display">Create a post</SheetTitle>
+          <SheetDescription>Share what you're learning, building or figuring out.</SheetDescription>
+        </SheetHeader>
         <Input
           className="mt-3"
           placeholder="Headline (optional)"
@@ -372,7 +376,8 @@ function Community() {
             {busy ? "Posting…" : "Post"}
           </Button>
         </div>
-      </section>
+        </SheetContent>
+      </Sheet>
 
       {/* Feed filter */}
       <div id="feed" className="mt-6 grid scroll-mt-32 grid-cols-3 gap-1 rounded-full bg-muted p-1">
