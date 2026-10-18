@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useMember } from "@/hooks/use-member";
 import { awardAchievement } from "@/lib/member-actions";
@@ -36,8 +37,6 @@ export const Route = createFileRoute("/_authenticated/community")({
 
 const QUICK_LINKS = [
   { icon: TrendingUp, label: "Progress", to: "/progress" as const },
-  { icon: MessageCircle, label: "Notifications", to: "/notifications" as const },
-  { icon: Calendar, label: "Events", to: "/events" as const },
   { icon: Lightbulb, label: "AI Tools", to: "/tools" as const },
   
 ];
@@ -63,6 +62,7 @@ function Community() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(false);
 
   const data = useQuery({
     queryKey: ["community", space, userId],
@@ -193,6 +193,7 @@ function Community() {
         .eq("user_id", userId);
       if ((count ?? 0) >= 5) await awardAchievement(userId, "community_builder", "Community Builder");
       await queryClient.invalidateQueries({ queryKey: ["community"] });
+      setComposerOpen(false);
       toast.success("Shared with the community.");
     } finally {
       setBusy(false);
