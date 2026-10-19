@@ -313,6 +313,42 @@ export type Database = {
         }
         Relationships: []
       }
+      enquiries: {
+        Row: {
+          created_at: string
+          email: string
+          enquiry_type: string
+          id: string
+          message: string
+          name: string
+          organisation: string | null
+          source_page: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          enquiry_type: string
+          id?: string
+          message: string
+          name: string
+          organisation?: string | null
+          source_page?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          enquiry_type?: string
+          id?: string
+          message?: string
+          name?: string
+          organisation?: string | null
+          source_page?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       enrollments: {
         Row: {
           completed_at: string | null
