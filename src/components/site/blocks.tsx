@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -169,4 +168,3 @@ export function EcosystemVisual() {
   );
 }
 
-export { Link };
