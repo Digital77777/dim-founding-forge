@@ -20,6 +20,7 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>): {
     reason?: string;
     redirect?: string;
+    mode?: "signin";
   } => {
     const reason = typeof search['reason'] === "string" ? search['reason'] : undefined;
     const raw = typeof search['redirect'] === "string" ? search['redirect'] : undefined;
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/auth")({
     return {
       ...(reason ? { reason } : {}),
       ...(redirect ? { redirect } : {}),
+      ...(search['mode'] === "signin" ? { mode: "signin" as const } : {}),
     };
   },
   head: () => ({
@@ -42,10 +44,10 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { reason, redirect } = Route.useSearch();
+  const { reason, redirect, mode: initialMode } = Route.useSearch();
   const expired = reason === "expired";
   const target = redirect && redirect !== "/auth" ? redirect : "/community";
-  const [mode, setMode] = useState<"signup" | "signin">(expired ? "signin" : "signup");
+  const [mode, setMode] = useState<"signup" | "signin">(expired || initialMode === "signin" ? "signin" : "signup");
   const [resolving, setResolving] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
   const [fullName, setFullName] = useState("");
