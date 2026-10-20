@@ -31,6 +31,8 @@ import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
+import { Route as ExploreIndexRouteImport } from './routes/explore.index'
+import { Route as ExploreAreaRouteImport } from './routes/explore.$area'
 import { Route as AuthenticatedLearnIndexRouteImport } from './routes/_authenticated/learn.index'
 import { Route as AuthenticatedLearnCourseRouteImport } from './routes/_authenticated/learn.$course'
 import { Route as AuthenticatedReelsIndexRouteImport } from './routes/_authenticated/reels.index'
@@ -151,6 +153,16 @@ const AuthenticatedRoadmapRoute = AuthenticatedRoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ExploreIndexRoute = ExploreIndexRouteImport.update({
+  id: '/explore/',
+  path: '/explore/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreAreaRoute = ExploreAreaRouteImport.update({
+  id: '/explore/$area',
+  path: '/explore/$area',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLearnIndexRoute = AuthenticatedLearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
@@ -206,6 +218,8 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/explore/$area': typeof ExploreAreaRoute
+  '/explore/': typeof ExploreIndexRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
@@ -235,6 +249,8 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/explore/$area': typeof ExploreAreaRoute
+  '/explore': typeof ExploreIndexRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
@@ -266,6 +282,8 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
+  '/explore/$area': typeof ExploreAreaRoute
+  '/explore/': typeof ExploreIndexRoute
   '/_authenticated/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/_authenticated/reels/create': typeof AuthenticatedReelsCreateRoute
   '/_authenticated/tools/$slug': typeof AuthenticatedToolsSlugRoute
@@ -297,6 +315,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/roadmap'
+    | '/explore/$area'
+    | '/explore/'
     | '/learn/$course'
     | '/reels/create'
     | '/tools/$slug'
@@ -326,6 +346,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/roadmap'
+    | '/explore/$area'
+    | '/explore'
     | '/learn/$course'
     | '/reels/create'
     | '/tools/$slug'
@@ -356,6 +378,8 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/progress'
     | '/_authenticated/roadmap'
+    | '/explore/$area'
+    | '/explore/'
     | '/_authenticated/learn/$course'
     | '/_authenticated/reels/create'
     | '/_authenticated/tools/$slug'
@@ -368,6 +392,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ExploreAreaRoute: typeof ExploreAreaRoute
+  ExploreIndexRoute: typeof ExploreIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -526,6 +552,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRoadmapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/explore/': {
+      id: '/explore/'
+      path: '/explore'
+      fullPath: '/explore/'
+      preLoaderRoute: typeof ExploreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore/$area': {
+      id: '/explore/$area'
+      path: '/explore/$area'
+      fullPath: '/explore/$area'
+      preLoaderRoute: typeof ExploreAreaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/learn/': {
       id: '/_authenticated/learn/'
       path: '/learn'
@@ -634,6 +674,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ExploreAreaRoute: ExploreAreaRoute,
+  ExploreIndexRoute: ExploreIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
