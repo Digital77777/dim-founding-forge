@@ -11,7 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as EliteRouteImport } from './routes/elite'
+import { Route as OrganisationsRouteImport } from './routes/organisations'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SocietyRouteImport } from './routes/society'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedBuildRouteImport } from './routes/_authenticated/build'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
@@ -33,6 +40,8 @@ import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
 import { Route as ExploreIndexRouteImport } from './routes/explore.index'
 import { Route as ExploreAreaRouteImport } from './routes/explore.$area'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AuthenticatedLearnIndexRouteImport } from './routes/_authenticated/learn.index'
 import { Route as AuthenticatedLearnCourseRouteImport } from './routes/_authenticated/learn.$course'
 import { Route as AuthenticatedReelsIndexRouteImport } from './routes/_authenticated/reels.index'
@@ -49,9 +58,44 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EliteRoute = EliteRouteImport.update({
+  id: '/elite',
+  path: '/elite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganisationsRoute = OrganisationsRouteImport.update({
+  id: '/organisations',
+  path: '/organisations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyRoute = SocietyRouteImport.update({
+  id: '/society',
+  path: '/society',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAchievementsRoute =
@@ -163,6 +207,16 @@ const ExploreAreaRoute = ExploreAreaRouteImport.update({
   path: '/explore/$area',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/insights/',
+  path: '/insights/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsSlugRoute = InsightsSlugRouteImport.update({
+  id: '/insights/$slug',
+  path: '/insights/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLearnIndexRoute = AuthenticatedLearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
@@ -198,7 +252,14 @@ const AuthenticatedToolsSlugRoute = AuthenticatedToolsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/elite': typeof EliteRoute
+  '/organisations': typeof OrganisationsRoute
+  '/privacy': typeof PrivacyRoute
+  '/society': typeof SocietyRoute
+  '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
@@ -219,7 +280,9 @@ export interface FileRoutesByFullPath {
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/explore/$area': typeof ExploreAreaRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/explore/': typeof ExploreIndexRoute
+  '/insights/': typeof InsightsIndexRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
@@ -229,7 +292,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/elite': typeof EliteRoute
+  '/organisations': typeof OrganisationsRoute
+  '/privacy': typeof PrivacyRoute
+  '/society': typeof SocietyRoute
+  '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
@@ -250,7 +320,9 @@ export interface FileRoutesByTo {
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/explore/$area': typeof ExploreAreaRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/explore': typeof ExploreIndexRoute
+  '/insights': typeof InsightsIndexRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
@@ -262,7 +334,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/elite': typeof EliteRoute
+  '/organisations': typeof OrganisationsRoute
+  '/privacy': typeof PrivacyRoute
+  '/society': typeof SocietyRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/build': typeof AuthenticatedBuildRoute
   '/_authenticated/career': typeof AuthenticatedCareerRoute
@@ -283,7 +362,9 @@ export interface FileRoutesById {
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
   '/explore/$area': typeof ExploreAreaRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/explore/': typeof ExploreIndexRoute
+  '/insights/': typeof InsightsIndexRoute
   '/_authenticated/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/_authenticated/reels/create': typeof AuthenticatedReelsCreateRoute
   '/_authenticated/tools/$slug': typeof AuthenticatedToolsSlugRoute
@@ -295,7 +376,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
+    | '/contact'
+    | '/elite'
+    | '/organisations'
+    | '/privacy'
+    | '/society'
+    | '/terms'
     | '/achievements'
     | '/build'
     | '/career'
@@ -316,7 +404,9 @@ export interface FileRouteTypes {
     | '/progress'
     | '/roadmap'
     | '/explore/$area'
+    | '/insights/$slug'
     | '/explore/'
+    | '/insights/'
     | '/learn/$course'
     | '/reels/create'
     | '/tools/$slug'
@@ -326,7 +416,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
+    | '/contact'
+    | '/elite'
+    | '/organisations'
+    | '/privacy'
+    | '/society'
+    | '/terms'
     | '/achievements'
     | '/build'
     | '/career'
@@ -347,7 +444,9 @@ export interface FileRouteTypes {
     | '/progress'
     | '/roadmap'
     | '/explore/$area'
+    | '/insights/$slug'
     | '/explore'
+    | '/insights'
     | '/learn/$course'
     | '/reels/create'
     | '/tools/$slug'
@@ -358,7 +457,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/auth'
+    | '/contact'
+    | '/elite'
+    | '/organisations'
+    | '/privacy'
+    | '/society'
+    | '/terms'
     | '/_authenticated/achievements'
     | '/_authenticated/build'
     | '/_authenticated/career'
@@ -379,7 +485,9 @@ export interface FileRouteTypes {
     | '/_authenticated/progress'
     | '/_authenticated/roadmap'
     | '/explore/$area'
+    | '/insights/$slug'
     | '/explore/'
+    | '/insights/'
     | '/_authenticated/learn/$course'
     | '/_authenticated/reels/create'
     | '/_authenticated/tools/$slug'
@@ -391,9 +499,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
+  EliteRoute: typeof EliteRoute
+  OrganisationsRoute: typeof OrganisationsRoute
+  PrivacyRoute: typeof PrivacyRoute
+  SocietyRoute: typeof SocietyRoute
+  TermsRoute: typeof TermsRoute
   ExploreAreaRoute: typeof ExploreAreaRoute
+  InsightsSlugRoute: typeof InsightsSlugRoute
   ExploreIndexRoute: typeof ExploreIndexRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -412,11 +529,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elite': {
+      id: '/elite'
+      path: '/elite'
+      fullPath: '/elite'
+      preLoaderRoute: typeof EliteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organisations': {
+      id: '/organisations'
+      path: '/organisations'
+      fullPath: '/organisations'
+      preLoaderRoute: typeof OrganisationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society': {
+      id: '/society'
+      path: '/society'
+      fullPath: '/society'
+      preLoaderRoute: typeof SocietyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/achievements': {
@@ -566,6 +732,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreAreaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/': {
+      id: '/insights/'
+      path: '/insights'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights/$slug': {
+      id: '/insights/$slug'
+      path: '/insights/$slug'
+      fullPath: '/insights/$slug'
+      preLoaderRoute: typeof InsightsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/learn/': {
       id: '/_authenticated/learn/'
       path: '/learn'
@@ -673,9 +853,18 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
+  EliteRoute: EliteRoute,
+  OrganisationsRoute: OrganisationsRoute,
+  PrivacyRoute: PrivacyRoute,
+  SocietyRoute: SocietyRoute,
+  TermsRoute: TermsRoute,
   ExploreAreaRoute: ExploreAreaRoute,
+  InsightsSlugRoute: InsightsSlugRoute,
   ExploreIndexRoute: ExploreIndexRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
