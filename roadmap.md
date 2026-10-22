@@ -23,3 +23,9 @@ Premium career-acceleration experience replacing the current Career hub page, re
 - [x] Career goal setup, AI roadmap (Lovable AI) and milestone tracking at /roadmap
 - [x] Replace global scrolling navigation with Community-only feed filters, space filters and Community shortcuts beneath the sticky header.
 - [x] Sticky footer tabs: Community (first, since it is the sign-in home page) replaces Home; Marketplace added; order Community / Learning / AI Tools / Build / Marketplace.
+- [x] Community: hero card and "Share something" removed; Create a post opens a sheet; rail always visible with My activity + Find members.
+- [x] Public company website (home, explore + 7 area pages, ELITE, Society, Organisations, About, Insights, Contact, Privacy, Terms), working enquiry form, sitemap + robots.
+- [ ] Add official DIM logo file (blocked: no logo asset in project — needs upload).
+- [ ] Verified contact email, socials, team/founder bios, DIM Society at UCT details (blocked: need confirmed info from DIM).
+- [ ] Legal review of privacy policy and terms (blocked: needs DIM/legal sign-off).
+- [ ] Connect custom domain digitalintelligencemarketplace.com and publish (blocked: user action).
