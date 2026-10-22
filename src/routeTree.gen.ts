@@ -17,6 +17,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as EliteRouteImport } from './routes/elite'
 import { Route as OrganisationsRouteImport } from './routes/organisations'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SocietyRouteImport } from './routes/society'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
@@ -86,6 +87,11 @@ const OrganisationsRoute = OrganisationsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocietyRoute = SocietyRouteImport.update({
@@ -258,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
@@ -298,6 +305,7 @@ export interface FileRoutesByTo {
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
@@ -340,6 +348,7 @@ export interface FileRoutesById {
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
@@ -382,6 +391,7 @@ export interface FileRouteTypes {
     | '/elite'
     | '/organisations'
     | '/privacy'
+    | '/sitemap.xml'
     | '/society'
     | '/terms'
     | '/achievements'
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
     | '/elite'
     | '/organisations'
     | '/privacy'
+    | '/sitemap.xml'
     | '/society'
     | '/terms'
     | '/achievements'
@@ -463,6 +474,7 @@ export interface FileRouteTypes {
     | '/elite'
     | '/organisations'
     | '/privacy'
+    | '/sitemap.xml'
     | '/society'
     | '/terms'
     | '/_authenticated/achievements'
@@ -505,6 +517,7 @@ export interface RootRouteChildren {
   EliteRoute: typeof EliteRoute
   OrganisationsRoute: typeof OrganisationsRoute
   PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SocietyRoute: typeof SocietyRoute
   TermsRoute: typeof TermsRoute
   ExploreAreaRoute: typeof ExploreAreaRoute
@@ -569,6 +582,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/society': {
@@ -859,6 +879,7 @@ const rootRouteChildren: RootRouteChildren = {
   EliteRoute: EliteRoute,
   OrganisationsRoute: OrganisationsRoute,
   PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SocietyRoute: SocietyRoute,
   TermsRoute: TermsRoute,
   ExploreAreaRoute: ExploreAreaRoute,
