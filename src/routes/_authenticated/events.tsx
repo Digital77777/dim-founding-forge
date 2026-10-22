@@ -7,6 +7,7 @@ import { COMING_SOON_FEATURES } from "@/lib/dim";
 const feature = COMING_SOON_FEATURES.find((f) => f.key === "events")!;
 
 export const Route = createFileRoute("/_authenticated/events")({
+  staticData: { sitemap: false },
   component: () => (
     <AppShell>
       <ComingSoon

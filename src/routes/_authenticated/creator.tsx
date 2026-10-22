@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HubPage } from "@/components/dim/HubPage";
 
 export const Route = createFileRoute("/_authenticated/creator")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Creator Hub — DIM Elite" },

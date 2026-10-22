@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMember, useInvalidateMember } from "@/hooks/use-member";
 
 export const Route = createFileRoute("/_authenticated/profile")({
+  staticData: { sitemap: false },
   component: ProfilePage,
 });
 

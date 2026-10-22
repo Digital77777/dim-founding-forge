@@ -10,6 +10,7 @@ import { useMember } from "@/hooks/use-member";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/achievements")({
+  staticData: { sitemap: false },
   component: Achievements,
 });
 

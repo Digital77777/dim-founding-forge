@@ -16,6 +16,7 @@ const DESCRIPTION =
   "Create your DIM ELITE account and claim a founding member place in the Digital Intelligence Marketplace beta.";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: false },
   ssr: false,
   validateSearch: (search: Record<string, unknown>): {
     reason?: string;

@@ -13,6 +13,7 @@ import { TOOL_CATEGORIES } from "@/lib/dim";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/tools/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "AI Tools Directory — DIM Elite" },

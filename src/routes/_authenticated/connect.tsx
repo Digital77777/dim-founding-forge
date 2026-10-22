@@ -7,6 +7,7 @@ import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/connect")({
+  staticData: { sitemap: false },
   component: Networking,
 });
 

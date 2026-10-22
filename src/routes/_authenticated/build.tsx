@@ -13,6 +13,7 @@ import { useMember } from "@/hooks/use-member";
 import { awardAchievement } from "@/lib/member-actions";
 
 export const Route = createFileRoute("/_authenticated/build")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Build Hub — DIM Elite" },

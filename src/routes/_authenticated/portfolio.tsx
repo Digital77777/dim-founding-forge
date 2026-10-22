@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMember } from "@/hooks/use-member";
 
 export const Route = createFileRoute("/_authenticated/portfolio")({
+  staticData: { sitemap: false },
   component: Portfolio,
 });
 

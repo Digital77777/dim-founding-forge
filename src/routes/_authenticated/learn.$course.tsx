@@ -11,6 +11,7 @@ import { useMember } from "@/hooks/use-member";
 import { awardAchievement } from "@/lib/member-actions";
 
 export const Route = createFileRoute("/_authenticated/learn/$course")({
+  staticData: { sitemap: false },
   component: CoursePage,
 });
 

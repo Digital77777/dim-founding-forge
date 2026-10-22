@@ -194,22 +194,6 @@ export const INSIGHT_CATEGORIES = [
 /** Published articles. Add genuine articles here — the Insights pages and sitemap pick them up. */
 export const ARTICLES: Article[] = [];
 
-/** Public routes listed in the sitemap. */
-export const PUBLIC_PATHS = [
-  "/",
-  "/explore",
-  ...ECOSYSTEM.map((a) => `/explore/${a.slug}`),
-  "/elite",
-  "/society",
-  "/organisations",
-  "/about",
-  "/insights",
-  ...ARTICLES.map((a) => `/insights/${a.slug}`),
-  "/contact",
-  "/privacy",
-  "/terms",
-];
-
 export function pageHead(path: string, title: string, description: string) {
   const url = `${SITE_URL}${path === "/" ? "" : path}`;
   return {

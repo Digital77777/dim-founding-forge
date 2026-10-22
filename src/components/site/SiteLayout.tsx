@@ -87,6 +87,7 @@ function SiteHeader() {
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`));
 
   return (
+    <>
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         <Link to="/" aria-label={`${COMPANY} home`} className="shrink-0">
@@ -150,6 +151,7 @@ function SiteHeader() {
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </Button>
       </div>
+    </header>
 
       {open ? (
         <div id="site-mobile-menu" className="fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto bg-background px-4 pb-10 pt-4 xl:hidden">
@@ -185,7 +187,7 @@ function SiteHeader() {
           </div>
         </div>
       ) : null}
-    </header>
+    </>
   );
 }
 

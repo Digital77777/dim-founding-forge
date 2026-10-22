@@ -17,6 +17,7 @@ import { STAGES } from "@/lib/dim";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/career")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "DIM Career | AI Career Development & Career Acceleration" },

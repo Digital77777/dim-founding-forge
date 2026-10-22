@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMember } from "@/hooks/use-member";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
+  staticData: { sitemap: false },
   component: Notifications,
 });
 
