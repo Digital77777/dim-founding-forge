@@ -10,3 +10,8 @@
 <!-- LOVABLE:END -->
 
 - AppShell accepts page-owned scrollHeader controls; keep Community filters tied to its local feed/space state rather than duplicating global navigation.
+- Public company website lives in top-level routes (/, /explore, /elite, /society, /organisations, /about, /insights, /contact, /privacy, /terms) wrapped in `SiteLayout`; its copy, feature statuses and contact details come from `src/lib/site.ts` so claims stay consistent and nothing unverified is shown.
+- "/" is the public homepage and no longer auto-redirects signed-in members; sign-in/sign-up and onboarding still land members in /community.
+- Founding membership is claimed in the `_authenticated` layout's beforeLoad (once per session) so members get their place wherever they land.
+- Public enquiries go through the `submitEnquiry` server function (validation, honeypot, per-email rate limit) into a private table readable only by admins.
+- Every route declares `staticData.sitemap`; the `_authenticated` subtree is excluded and /sitemap.xml is built from the router.
