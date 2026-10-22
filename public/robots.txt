@@ -12,3 +12,10 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /profile
+Disallow: /notifications
+
+Sitemap: https://digitalintelligencemarketplace.com/sitemap.xml
