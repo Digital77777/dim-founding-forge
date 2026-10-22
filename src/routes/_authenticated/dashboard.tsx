@@ -11,6 +11,7 @@ import { firstName, greeting, useMember, useInvalidateMember } from "@/hooks/use
 import { BETA_AVAILABILITY, STAGES, stageClasses } from "@/lib/dim";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  staticData: { sitemap: false },
   component: Dashboard,
 });
 

@@ -16,6 +16,7 @@ import { useMember } from "@/hooks/use-member";
 import { generateRoadmap } from "@/lib/career.functions";
 
 export const Route = createFileRoute("/_authenticated/roadmap")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "My Career Roadmap | DIM Career" },

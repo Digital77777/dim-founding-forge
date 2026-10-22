@@ -10,6 +10,7 @@ import { EXPERIENCE_LEVELS, INTEREST_OPTIONS, ONBOARDING_GOALS } from "@/lib/dim
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
+  staticData: { sitemap: false },
   component: Onboarding,
 });
 

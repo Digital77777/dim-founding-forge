@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { COMING_SOON_FEATURES } from "@/lib/dim";
 
 export const Route = createFileRoute("/_authenticated/coming-soon")({
+  staticData: { sitemap: false },
   component: ComingSoonIndex,
 });
 

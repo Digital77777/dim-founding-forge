@@ -9,6 +9,7 @@ import { useMember } from "@/hooks/use-member";
 import { STAGES, stageClasses } from "@/lib/dim";
 
 export const Route = createFileRoute("/_authenticated/progress")({
+  staticData: { sitemap: false },
   component: ProgressPage,
 });
 

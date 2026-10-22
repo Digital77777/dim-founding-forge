@@ -22,6 +22,7 @@ import { awardAchievement } from "@/lib/member-actions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/community")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "DIM Community | Discussions, Reels & Member Spaces" },

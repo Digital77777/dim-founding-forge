@@ -37,6 +37,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/_authenticated/reels/")({
+  staticData: { sitemap: false },
   validateSearch: zodValidator(searchSchema),
   component: Reels,
 });

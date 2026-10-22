@@ -17,6 +17,7 @@ import { BETA_AVAILABILITY } from "@/lib/dim";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/elite-beta")({
+  staticData: { sitemap: false },
   component: EliteBeta,
 });
 

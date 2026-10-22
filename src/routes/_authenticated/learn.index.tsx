@@ -12,6 +12,7 @@ import { useMember } from "@/hooks/use-member";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/learn/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Learning Hub — DIM Elite" },
