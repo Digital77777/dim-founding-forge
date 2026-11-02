@@ -56,6 +56,7 @@
   --color-connect: var(--connect);
   --color-earn: var(--earn);
   --color-grow: var(--grow);
+  --color-whatsapp: var(--whatsapp);
 
   --color-chart-1: var(--learn);
   --color-chart-2: var(--build);
@@ -117,6 +118,7 @@
   --connect: oklch(0.68 0.17 215);
   --earn: oklch(0.72 0.15 195);
   --grow: oklch(0.6 0.2 280);
+  --whatsapp: oklch(0.72 0.17 156);
 
   --sidebar: oklch(0.17 0.05 268);
   --sidebar-foreground: oklch(0.94 0.01 250);

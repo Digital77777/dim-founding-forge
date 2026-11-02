@@ -435,9 +435,12 @@ function Reels() {
       const ids = rows.map((p) => p.id);
       const authorIds = [...new Set(rows.map((p) => p.user_id))];
 
-      const [likesRes, commentsRes, profilesRes, membersRes, followsRes] = await Promise.all([
+      const [myLikesRes, likeCountsRes, commentsRes, profilesRes, membersRes, followsRes] = await Promise.all([
         ids.length
-          ? supabase.from("likes").select("post_id, user_id").in("post_id", ids)
+          ? supabase.from("likes").select("post_id").eq("user_id", userId ?? "").in("post_id", ids)
+          : Promise.resolve({ data: [] }),
+        ids.length
+          ? supabase.from("like_counts").select("post_id, like_count").in("post_id", ids)
           : Promise.resolve({ data: [] }),
         ids.length
           ? supabase.from("comments").select("*").in("post_id", ids).order("created_at")
@@ -491,7 +494,10 @@ function Reels() {
 
       return {
         reels,
-        likes: (likesRes.data ?? []) as { post_id: string; user_id: string }[],
+        likes: (myLikesRes.data ?? []) as { post_id: string }[],
+        likeCounts: new Map<string, number>(
+          (likeCountsRes.data ?? []).map((c) => [c.post_id as string, c.like_count as number]),
+        ),
         comments: (commentsRes.data ?? []) as {
           id: string;
           post_id: string;
@@ -798,7 +804,7 @@ function Reels() {
           className="h-[100svh] snap-y snap-mandatory overflow-y-auto overscroll-contain"
         >
           {reels.map((reel, i) => {
-            const likes = (data.data?.likes ?? []).filter((l) => l.post_id === reel.id);
+            const liked = (data.data?.likes ?? []).some((l) => l.post_id === reel.id);
             const comments = (data.data?.comments ?? []).filter((c) => c.post_id === reel.id);
             const isFollowing = !!data.data?.following.has(reel.user_id);
             return (
@@ -808,8 +814,8 @@ function Reels() {
                 index={i}
                 activeIndex={activeIndex}
                 author={data.data?.authors.get(reel.user_id)}
-                liked={likes.some((l) => l.user_id === userId)}
-                likeCount={likes.length}
+                liked={liked}
+                likeCount={data.data?.likeCounts.get(reel.id) ?? 0}
                 commentCount={comments.length}
                 comments={comments}
                 authorFor={(id) => data.data?.authors.get(id)}
@@ -817,7 +823,7 @@ function Reels() {
                 isSelf={reel.user_id === userId}
                 muted={muted}
                 onToggleMuted={() => setMuted((v) => !v)}
-                onToggleLike={() => toggleLike(reel.id, likes.some((l) => l.user_id === userId))}
+                onToggleLike={() => toggleLike(reel.id, liked)}
                 onToggleFollow={() => toggleFollow(reel.user_id, isFollowing)}
                 onComment={(body) => addComment(reel.id, body)}
                 onTagClick={(tag) => setFilters({ tag })}

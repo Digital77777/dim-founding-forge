@@ -15,6 +15,13 @@
       "when": 1792388383981,
       "tag": "0001_create_enquiries",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793599464832,
+      "tag": "0002_restrict_social_graph_and_add_count_views",
+      "breakpoints": true
     }
   ]
 }

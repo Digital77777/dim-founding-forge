@@ -79,9 +79,12 @@ function Community() {
       const posts = (postsRes.data ?? []) as CommunityPostRow[];
       const ids = posts.map((p) => p.id);
       const authorIds = [...new Set(posts.map((p) => p.user_id))];
-      const [likesRes, commentsRes, profilesRes, membersRes] = await Promise.all([
+      const [myLikesRes, likeCountsRes, commentsRes, profilesRes, membersRes] = await Promise.all([
         ids.length
-          ? supabase.from("likes").select("post_id, user_id").in("post_id", ids)
+          ? supabase.from("likes").select("post_id").eq("user_id", userId ?? "").in("post_id", ids)
+          : Promise.resolve({ data: [] }),
+        ids.length
+          ? supabase.from("like_counts").select("post_id, like_count").in("post_id", ids)
           : Promise.resolve({ data: [] }),
         ids.length
           ? supabase.from("comments").select("*").in("post_id", ids).order("created_at")
@@ -127,7 +130,10 @@ function Community() {
       return {
         spaces: spacesRes.data ?? [],
         posts,
-        likes: (likesRes.data ?? []) as { post_id: string; user_id: string }[],
+        likes: (myLikesRes.data ?? []) as { post_id: string }[],
+        likeCounts: new Map<string, number>(
+          (likeCountsRes.data ?? []).map((c) => [c.post_id as string, c.like_count as number]),
+        ),
         comments: (commentsRes.data ?? []) as PostComment[],
         authors,
         mediaUrls,
@@ -401,14 +407,14 @@ function Community() {
 
       <section className="mt-4 space-y-4">
         {visible.map((p) => {
-          const likes = (d?.likes ?? []).filter((l) => l.post_id === p.id);
+          const liked = (d?.likes ?? []).some((l) => l.post_id === p.id);
           const props = {
             post: p,
-            liked: likes.some((l) => l.user_id === userId),
-            likeCount: likes.length,
+            liked,
+            likeCount: d?.likeCounts.get(p.id) ?? 0,
             comments: (d?.comments ?? []).filter((c) => c.post_id === p.id),
             authorFor: (id: string) => d?.authors.get(id),
-            onToggleLike: () => toggleLike(p.id, likes.some((l) => l.user_id === userId)),
+            onToggleLike: () => toggleLike(p.id, liked),
             onComment: (value: string) => addComment(p.id, value),
             mediaUrl: p.media_path ? (d?.mediaUrls.get(p.media_path) ?? null) : null,
           };

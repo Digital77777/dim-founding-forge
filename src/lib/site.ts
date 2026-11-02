@@ -21,6 +21,15 @@ export const CONTACT: { email: string | null; phone: string | null; address: str
 /** Verified social profiles only. Add entries like { label: "LinkedIn", href: "https://…" }. */
 export const SOCIALS: { label: string; href: string }[] = [];
 
+/**
+ * Verified WhatsApp contact. The floating button and contact page link here;
+ * update the number in one place.
+ */
+export const WHATSAPP_DISPLAY = "+27 67 164 2375";
+export const WHATSAPP_NUMBER = "27671642375";
+export const WHATSAPP_MESSAGE = "Hi DIM, I'd like to know more.";
+export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+
 export type Status = "available" | "beta" | "development" | "planned";
 
 export const STATUS_LABEL: Record<Status, string> = {
