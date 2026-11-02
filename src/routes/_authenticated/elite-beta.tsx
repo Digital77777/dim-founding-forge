@@ -34,11 +34,18 @@ function EliteBeta() {
   const data = useQuery({
     queryKey: ["feedback", userId],
     queryFn: async () => {
-      const [items, votes] = await Promise.all([
+      const [items, myVotes, voteCounts] = await Promise.all([
         supabase.from("feedback_items").select("*").order("created_at", { ascending: false }).limit(60),
-        supabase.from("feedback_votes").select("item_id, user_id"),
+        supabase.from("feedback_votes").select("item_id").eq("user_id", userId ?? ""),
+        supabase.from("feedback_vote_counts").select("item_id, vote_count"),
       ]);
-      return { items: items.data ?? [], votes: votes.data ?? [] };
+      return {
+        items: items.data ?? [],
+        votes: myVotes.data ?? [],
+        voteCounts: new Map<string, number>(
+          (voteCounts.data ?? []).map((c) => [c.item_id as string, c.vote_count as number]),
+        ),
+      };
     },
   });
 
@@ -124,8 +131,7 @@ function EliteBeta() {
         </div>
         <div className="mt-4 space-y-3">
           {(data.data?.items ?? []).map((item) => {
-            const votes = (data.data?.votes ?? []).filter((v) => v.item_id === item.id);
-            const voted = votes.some((v) => v.user_id === userId);
+            const voted = (data.data?.votes ?? []).some((v) => v.item_id === item.id);
             return (
               <article
                 key={item.id}
@@ -139,7 +145,7 @@ function EliteBeta() {
                   )}
                 >
                   <ChevronUp className="size-4" />
-                  <span className="text-xs font-bold tabular-nums">{votes.length}</span>
+                  <span className="text-xs font-bold tabular-nums">{data.data?.voteCounts.get(item.id) ?? 0}</span>
                 </button>
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">
