@@ -955,7 +955,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      feedback_vote_counts: {
+        Row: {
+          item_id: string | null
+          vote_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_votes_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "feedback_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      like_counts: {
+        Row: {
+          like_count: number | null
+          post_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       claim_membership: { Args: { _full_name?: string }; Returns: number }
