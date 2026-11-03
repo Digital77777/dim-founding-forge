@@ -43,8 +43,8 @@ function Elite({ open }: { open: boolean | null }) {
     <SiteLayout>
       <PageHero
         eyebrow="DIM ELITE · A flagship offering of Digital Intelligence Marketplace"
-        title="More ways to learn, apply AI and grow with DIM."
-        intro="Discover a connected experience designed to help you explore AI tools, develop practical skills, connect with a community and pursue your digital goals."
+        title="Everything DIM offers, in one membership."
+        intro="Learning, AI tools, career development, community and creator resources — connected, so your progress in one area carries into the others."
       >
         <Button asChild size="lg" className="bg-ember text-primary-foreground shadow-glow">
           <Link to="/auth">Join DIM ELITE</Link>
