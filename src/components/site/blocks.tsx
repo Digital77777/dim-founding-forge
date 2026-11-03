@@ -72,11 +72,10 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary/8 via-background to-background">
-      <div className="pointer-events-none absolute inset-0 grid-paper opacity-40" aria-hidden />
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+    <section className="border-b border-border bg-muted/50">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
         <Eyebrow>{eyebrow}</Eyebrow>
-        <h1 className="mt-4 max-w-4xl font-display text-4xl font-extrabold leading-[1.05] sm:text-6xl">{title}</h1>
+        <h1 className="mt-4 max-w-4xl font-display text-4xl font-extrabold leading-[1.05] sm:text-5xl">{title}</h1>
         <div className="mt-5 max-w-2xl text-lg text-muted-foreground">{intro}</div>
         {children ? <div className="mt-8 flex flex-wrap gap-3">{children}</div> : null}
       </div>

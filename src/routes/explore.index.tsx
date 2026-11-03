@@ -23,7 +23,7 @@ function Explore() {
     <SiteLayout>
       <PageHero
         eyebrow="Explore DIM"
-        title="One connected ecosystem, used your way."
+        title="Everything DIM offers, and how it fits together."
         intro="DIM is organised around a simple journey — Learn, Build, Connect, Earn, Grow — with community connecting every step. Start wherever makes sense for you."
       >
         <Button asChild size="lg" className="bg-ember text-primary-foreground shadow-glow">

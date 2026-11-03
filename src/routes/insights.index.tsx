@@ -19,7 +19,7 @@ export const Route = createFileRoute("/insights/")({
 function Insights() {
   return (
     <SiteLayout>
-      <PageHero eyebrow="Insights" title="Practical ideas for the AI-powered economy." intro="Guides and updates on using AI well, building digital skills and growing your career." />
+      <PageHero eyebrow="Insights" title="Plain-language guides for working with AI." intro="Ideas and updates on learning, building skills and growing your career — written for people, not engineers." />
       <Section title="Topics">
         <ul className="flex flex-wrap gap-2">
           {INSIGHT_CATEGORIES.map((c) => (
