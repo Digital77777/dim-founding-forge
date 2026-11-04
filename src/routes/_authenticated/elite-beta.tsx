@@ -36,7 +36,7 @@ function EliteBeta() {
     queryFn: async () => {
       const [items, myVotes, voteCounts] = await Promise.all([
         supabase.from("feedback_items").select("*").order("created_at", { ascending: false }).limit(60),
-        supabase.from("feedback_votes").select("item_id").eq("user_id", userId ?? ""),
+        userId ? supabase.from("feedback_votes").select("item_id").eq("user_id", userId) : Promise.resolve({ data: [] }),
         supabase.from("feedback_vote_counts").select("item_id, vote_count"),
       ]);
       return {
