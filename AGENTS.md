@@ -15,3 +15,4 @@
 - Founding membership is claimed in the `_authenticated` layout's beforeLoad (once per session) so members get their place wherever they land.
 - Public enquiries go through the `submitEnquiry` server function (validation, honeypot, per-email rate limit) into a private table readable only by admins.
 - Every route declares `staticData.sitemap`; the `_authenticated` subtree is excluded and /sitemap.xml is built from the router.
+- Social-graph tables (follows, likes, feedback_votes) are owner-only under RLS; any public aggregate (like counts, vote counts) must come from the `like_counts` / `feedback_vote_counts` views, never from reading the raw table — this keeps member-level activity private while counts stay visible.

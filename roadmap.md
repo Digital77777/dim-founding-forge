@@ -25,6 +25,8 @@ Premium career-acceleration experience replacing the current Career hub page, re
 - [x] Sticky footer tabs: Community (first, since it is the sign-in home page) replaces Home; Marketplace added; order Community / Learning / AI Tools / Build / Marketplace.
 - [x] Community: hero card and "Share something" removed; Create a post opens a sheet; rail always visible with My activity + Find members.
 - [x] Public company website (home, explore + 7 area pages, ELITE, Society, Organisations, About, Insights, Contact, Privacy, Terms), working enquiry form, sitemap + robots.
+- [x] Public site refresh: calmer professional layout with human-sounding copy, floating WhatsApp button (+27 67 164 2375) on every public page, WhatsApp contact on the footer and contact page; verified at mobile, tablet and desktop widths.
+- [x] Tightened database access: follow graph, likes and feedback votes are now private to each member, with public counts served through aggregate views; community likes and beta-feedback votes re-verified in-app.
 - [ ] Add official DIM logo file (blocked: no logo asset in project — needs upload).
 - [ ] Verified contact email, socials, team/founder bios, DIM Society at UCT details (blocked: need confirmed info from DIM).
 - [ ] Legal review of privacy policy and terms (blocked: needs DIM/legal sign-off).
