@@ -80,8 +80,8 @@ function Community() {
       const ids = posts.map((p) => p.id);
       const authorIds = [...new Set(posts.map((p) => p.user_id))];
       const [myLikesRes, likeCountsRes, commentsRes, profilesRes, membersRes] = await Promise.all([
-        ids.length
-          ? supabase.from("likes").select("post_id").eq("user_id", userId ?? "").in("post_id", ids)
+        ids.length && userId
+          ? supabase.from("likes").select("post_id").eq("user_id", userId).in("post_id", ids)
           : Promise.resolve({ data: [] }),
         ids.length
           ? supabase.from("like_counts").select("post_id, like_count").in("post_id", ids)
