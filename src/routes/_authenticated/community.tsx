@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { youtubeId } from "@/lib/reels";
 import { useMember } from "@/hooks/use-member";
 import { awardAchievement } from "@/lib/member-actions";
 import { cn } from "@/lib/utils";
@@ -42,21 +43,13 @@ const QUICK_LINKS = [
   
 ];
 
-type Feed = "all" | "posts" | "media" | "mine";
-
-const FEED_OPTIONS: { key: Feed; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "posts", label: "Discussions" },
-  { key: "media", label: "Reels & photos" },
-];
-
 function Community() {
   const { userId } = useMember();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [space, setSpace] = useState<string | null>(null);
-  const [feed, setFeed] = useState<Feed>("all");
+  const [mine, setMine] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState("");
@@ -221,13 +214,7 @@ function Community() {
   }
 
   const visible = (d?.posts ?? []).filter((p) =>
-    feed === "all"
-      ? true
-      : feed === "mine"
-        ? p.user_id === userId
-        : feed === "media"
-          ? !!p.media_path
-          : !p.media_path,
+    mine ? p.user_id === userId : true,
   );
 
   const railChip =
@@ -260,10 +247,10 @@ function Community() {
         </Link>
         <button
           type="button"
-          aria-pressed={feed === "mine"}
-          className={cn(railChip, feed === "mine" && "border-primary bg-primary/10 text-primary")}
+          aria-pressed={mine}
+          className={cn(railChip, mine && "border-primary bg-primary/10 text-primary")}
           onClick={() => {
-            setFeed(feed === "mine" ? "all" : "mine");
+            setMine(!mine);
             scrollTo("feed");
           }}
         >
@@ -296,7 +283,7 @@ function Community() {
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">DIM Community</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-            {feed === "mine" ? "My activity" : "Community feed"}
+            {mine ? "My activity" : "Community feed"}
           </h1>
         </div>
       </header>
@@ -387,25 +374,8 @@ function Community() {
         </SheetContent>
       </Sheet>
 
-      {/* Feed filter */}
-      <div id="feed" className="mt-6 grid scroll-mt-32 grid-cols-3 gap-1 rounded-full bg-muted p-1">
-        {(
-          FEED_OPTIONS
-        ).map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setFeed(t.key)}
-            className={cn(
-              "rounded-full py-2 text-sm font-semibold transition",
-              feed === t.key ? "bg-card text-primary shadow-sm" : "text-muted-foreground",
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      <section className="mt-4 space-y-4">
+      {/* Feed */}
+      <section id="feed" className="mt-4 scroll-mt-32 space-y-4">
         {visible.map((p) => {
           const liked = (d?.likes ?? []).some((l) => l.post_id === p.id);
           const props = {
@@ -418,7 +388,7 @@ function Community() {
             onComment: (value: string) => addComment(p.id, value),
             mediaUrl: p.media_path ? (d?.mediaUrls.get(p.media_path) ?? null) : null,
           };
-          return p.media_path ? (
+          return p.media_path || (p.media_url && youtubeId(p.media_url)) ? (
             <MediaPostCard key={p.id} {...props} />
           ) : (
             <TextPostCard key={p.id} {...props} />

@@ -13,6 +13,7 @@ import { useState } from "react";
 
 
 import { FoundingBadge } from "@/components/dim/FoundingBadge";
+import { youtubeEmbedUrl, youtubeId, youtubeThumb } from "@/lib/reels";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export type CommunityPostRow = {
   created_at: string;
   media_path: string | null;
   media_type: string | null;
+  media_url: string | null;
   tags: string[];
 };
 
@@ -270,6 +272,8 @@ export function MediaPostCard({
 }: { post: CommunityPostRow; mediaUrl?: string | null } & Handlers) {
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [ytPlaying, setYtPlaying] = useState(false);
+  const yt = post.media_url ? youtubeId(post.media_url) : null;
   return (
     <article className="-mx-4 overflow-hidden border-y border-border bg-card shadow-sm sm:mx-0 sm:rounded-2xl sm:border">
       <div className="px-4 py-3">
@@ -277,7 +281,43 @@ export function MediaPostCard({
       </div>
 
       <div className="relative w-full bg-ink">
-        {mediaUrl ? (
+        {yt ? (
+          ytPlaying ? (
+            <div className="aspect-video w-full">
+              <iframe
+                src={youtubeEmbedUrl(yt, { autoplay: true, muted: false })}
+                title={post.title ?? "Community reel"}
+                className="size-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setYtPlaying(true)}
+              aria-label="Play reel"
+              className="group relative block aspect-video w-full"
+            >
+              <img
+                src={youtubeThumb(yt)}
+                alt={post.title ?? "Community reel"}
+                loading="lazy"
+                className="size-full object-cover"
+              />
+              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
+              <span className="pointer-events-none absolute inset-0 grid place-items-center">
+                <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur transition group-hover:scale-105">
+                  <Play className="size-7 fill-current" />
+                </span>
+              </span>
+              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
+                <Clapperboard className="size-3.5" /> Reel
+              </span>
+            </button>
+          )
+        ) : mediaUrl ? (
           post.media_type === "video" ? (
             <Link
               to="/reels"
