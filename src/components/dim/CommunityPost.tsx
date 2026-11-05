@@ -13,6 +13,7 @@ import { useState } from "react";
 
 
 import { FoundingBadge } from "@/components/dim/FoundingBadge";
+import { youtubeEmbedUrl, youtubeId, youtubeThumb } from "@/lib/reels";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export type CommunityPostRow = {
   created_at: string;
   media_path: string | null;
   media_type: string | null;
+  media_url: string | null;
   tags: string[];
 };
 
