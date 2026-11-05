@@ -281,7 +281,43 @@ export function MediaPostCard({
       </div>
 
       <div className="relative w-full bg-ink">
-        {mediaUrl ? (
+        {yt ? (
+          ytPlaying ? (
+            <div className="aspect-video w-full">
+              <iframe
+                src={youtubeEmbedUrl(yt, { autoplay: true, muted: false })}
+                title={post.title ?? "Community reel"}
+                className="size-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setYtPlaying(true)}
+              aria-label="Play reel"
+              className="group relative block aspect-video w-full"
+            >
+              <img
+                src={youtubeThumb(yt)}
+                alt={post.title ?? "Community reel"}
+                loading="lazy"
+                className="size-full object-cover"
+              />
+              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
+              <span className="pointer-events-none absolute inset-0 grid place-items-center">
+                <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur transition group-hover:scale-105">
+                  <Play className="size-7 fill-current" />
+                </span>
+              </span>
+              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
+                <Clapperboard className="size-3.5" /> Reel
+              </span>
+            </button>
+          )
+        ) : mediaUrl ? (
           post.media_type === "video" ? (
             <Link
               to="/reels"
