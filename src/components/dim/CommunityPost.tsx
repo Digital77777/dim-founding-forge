@@ -272,6 +272,8 @@ export function MediaPostCard({
 }: { post: CommunityPostRow; mediaUrl?: string | null } & Handlers) {
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [ytPlaying, setYtPlaying] = useState(false);
+  const yt = post.media_url ? youtubeId(post.media_url) : null;
   return (
     <article className="-mx-4 overflow-hidden border-y border-border bg-card shadow-sm sm:mx-0 sm:rounded-2xl sm:border">
       <div className="px-4 py-3">
