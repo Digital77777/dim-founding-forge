@@ -213,13 +213,7 @@ function Community() {
   }
 
   const visible = (d?.posts ?? []).filter((p) =>
-    feed === "all"
-      ? true
-      : feed === "mine"
-        ? p.user_id === userId
-        : feed === "media"
-          ? !!p.media_path
-          : !p.media_path,
+    mine ? p.user_id === userId : true,
   );
 
   const railChip =
@@ -252,10 +246,10 @@ function Community() {
         </Link>
         <button
           type="button"
-          aria-pressed={feed === "mine"}
-          className={cn(railChip, feed === "mine" && "border-primary bg-primary/10 text-primary")}
+          aria-pressed={mine}
+          className={cn(railChip, mine && "border-primary bg-primary/10 text-primary")}
           onClick={() => {
-            setFeed(feed === "mine" ? "all" : "mine");
+            setMine(!mine);
             scrollTo("feed");
           }}
         >
