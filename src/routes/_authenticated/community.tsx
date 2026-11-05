@@ -42,21 +42,13 @@ const QUICK_LINKS = [
   
 ];
 
-type Feed = "all" | "posts" | "media" | "mine";
-
-const FEED_OPTIONS: { key: Feed; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "posts", label: "Discussions" },
-  { key: "media", label: "Reels & photos" },
-];
-
 function Community() {
   const { userId } = useMember();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [space, setSpace] = useState<string | null>(null);
-  const [feed, setFeed] = useState<Feed>("all");
+  const [mine, setMine] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState("");
