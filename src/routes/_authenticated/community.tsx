@@ -282,7 +282,7 @@ function Community() {
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">DIM Community</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-            {feed === "mine" ? "My activity" : "Community feed"}
+            {mine ? "My activity" : "Community feed"}
           </h1>
         </div>
       </header>
@@ -373,25 +373,8 @@ function Community() {
         </SheetContent>
       </Sheet>
 
-      {/* Feed filter */}
-      <div id="feed" className="mt-6 grid scroll-mt-32 grid-cols-3 gap-1 rounded-full bg-muted p-1">
-        {(
-          FEED_OPTIONS
-        ).map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setFeed(t.key)}
-            className={cn(
-              "rounded-full py-2 text-sm font-semibold transition",
-              feed === t.key ? "bg-card text-primary shadow-sm" : "text-muted-foreground",
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      <section className="mt-4 space-y-4">
+      {/* Feed */}
+      <section id="feed" className="mt-4 scroll-mt-32 space-y-4">
         {visible.map((p) => {
           const liked = (d?.likes ?? []).some((l) => l.post_id === p.id);
           const props = {
