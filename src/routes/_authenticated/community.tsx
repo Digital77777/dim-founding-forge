@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { youtubeId } from "@/lib/reels";
 import { useMember } from "@/hooks/use-member";
 import { awardAchievement } from "@/lib/member-actions";
 import { cn } from "@/lib/utils";
@@ -387,7 +388,7 @@ function Community() {
             onComment: (value: string) => addComment(p.id, value),
             mediaUrl: p.media_path ? (d?.mediaUrls.get(p.media_path) ?? null) : null,
           };
-          return p.media_path ? (
+          return p.media_path || (p.media_url && youtubeId(p.media_url)) ? (
             <MediaPostCard key={p.id} {...props} />
           ) : (
             <TextPostCard key={p.id} {...props} />
