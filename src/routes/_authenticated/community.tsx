@@ -89,7 +89,7 @@ function Community() {
               .in("id", authorIds)
           : Promise.resolve({ data: [] }),
         authorIds.length
-          ? supabase.from("elite_members").select("user_id, founding_number").in("user_id", authorIds)
+          ? supabase.from("member_badges").select("user_id, founding_number").in("user_id", authorIds)
           : Promise.resolve({ data: [] }),
       ]);
 

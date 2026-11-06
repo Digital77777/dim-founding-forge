@@ -22,6 +22,13 @@
       "when": 1793599464832,
       "tag": "0002_restrict_social_graph_and_add_count_views",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793999930491,
+      "tag": "0003_restrict_member_and_connection_reads",
+      "breakpoints": true
     }
   ]
 }

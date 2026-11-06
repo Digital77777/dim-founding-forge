@@ -22,7 +22,7 @@ function Networking() {
         .limit(60);
       const ids = (profiles ?? []).map((p) => p.id);
       const { data: members } = ids.length
-        ? await supabase.from("elite_members").select("user_id, founding_number").in("user_id", ids)
+        ? await supabase.from("member_badges").select("user_id, founding_number").in("user_id", ids)
         : { data: [] };
       return {
         profiles: profiles ?? [],

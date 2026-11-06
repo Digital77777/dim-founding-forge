@@ -449,7 +449,7 @@ function Reels() {
           ? supabase.from("profiles").select("id, full_name, headline, avatar_url").in("id", authorIds)
           : Promise.resolve({ data: [] }),
         authorIds.length
-          ? supabase.from("elite_members").select("user_id, founding_number").in("user_id", authorIds)
+          ? supabase.from("member_badges").select("user_id, founding_number").in("user_id", authorIds)
           : Promise.resolve({ data: [] }),
         userId
           ? supabase.from("follows").select("following_id").eq("follower_id", userId)
