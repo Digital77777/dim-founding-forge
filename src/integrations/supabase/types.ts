@@ -985,6 +985,21 @@ export type Database = {
           },
         ]
       }
+      member_badges: {
+        Row: {
+          founding_number: number | null
+          user_id: string | null
+        }
+        Insert: {
+          founding_number?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          founding_number?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       claim_membership: { Args: { _full_name?: string }; Returns: number }
