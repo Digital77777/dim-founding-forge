@@ -276,6 +276,9 @@ export function MediaPostCard({
   const mediaContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const yt = post.media_url ? youtubeId(post.media_url) : null;
+  const isYoutubeShort = Boolean(
+    post.media_url?.includes("/shorts/") || post.media_url?.includes("youtube.com/shorts"),
+  );
 
   useEffect(() => {
     const container = mediaContainerRef.current;
@@ -307,7 +310,7 @@ export function MediaPostCard({
       <div ref={mediaContainerRef} className="relative w-full bg-ink">
         {yt ? (
           ytPlaying || inView ? (
-            <div className="aspect-video w-full">
+            <div className={cn("w-full", isYoutubeShort ? "aspect-[9/16]" : "aspect-video")}>
               <iframe
                 src={youtubeEmbedUrl(yt, { autoplay: true, muted: !ytPlaying })}
                 title={post.title ?? "Community reel"}
@@ -322,13 +325,16 @@ export function MediaPostCard({
               type="button"
               onClick={() => setYtPlaying(true)}
               aria-label="Play reel"
-              className="group relative block aspect-video w-full"
+              className={cn(
+                "group relative block w-full",
+                isYoutubeShort ? "aspect-[9/16]" : "aspect-video",
+              )}
             >
               <img
                 src={youtubeThumb(yt)}
                 alt={post.title ?? "Community reel"}
                 loading="lazy"
-                className="size-full object-cover"
+                className="size-full bg-ink object-contain"
               />
               <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
               <span className="pointer-events-none absolute inset-0 grid place-items-center">
