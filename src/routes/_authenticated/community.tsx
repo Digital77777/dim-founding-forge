@@ -319,16 +319,8 @@ function Community() {
     </div>
   );
 
-  const spacePill = (active: boolean) =>
-    cn(
-      "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors",
-      active
-        ? "border-transparent bg-primary text-primary-foreground shadow-sm"
-        : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
-    );
-
   return (
-    <AppShell scrollHeader={communityScrollHeader}>
+    <AppShell>
       <header className="flex items-end justify-between gap-3">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
@@ -340,23 +332,8 @@ function Community() {
         </div>
       </header>
 
-      {/* Spaces */}
-      <div
-        className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        aria-label="Community spaces"
-      >
-        <button onClick={() => setSpace(null)} className={spacePill(!space)}>
-          All spaces
-        </button>
-        {(d?.spaces ?? []).map((s) => (
-          <button
-            key={s.slug}
-            onClick={() => setSpace(s.slug)}
-            className={spacePill(space === s.slug)}
-          >
-            {s.name}
-          </button>
-        ))}
+      <div className="-mx-4 mt-5 border-y border-border/70 bg-muted/20">
+        {communityScrollHeader}
       </div>
 
       {/* Composer (opened from "Create a post") */}
