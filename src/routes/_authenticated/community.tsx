@@ -256,12 +256,12 @@ function Community() {
   const visible = d?.posts ?? [];
 
   const railChip =
-    "inline-flex h-9 min-w-0 shrink-0 snap-start items-center justify-center gap-1.5 rounded-full border border-primary/20 bg-card px-2 text-[11px] font-semibold whitespace-nowrap text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none sm:px-3 sm:text-xs";
+    "inline-flex h-9 w-max shrink-0 snap-start items-center justify-center gap-1.5 rounded-full border border-primary/20 bg-card px-3 text-xs font-semibold whitespace-nowrap text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none";
 
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
       <div
-        className="grid grid-cols-5 gap-1.5 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex sm:gap-2"
+        className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Community features"
       >
         <button type="button" className={railChip} onClick={() => setComposerOpen(true)}>
