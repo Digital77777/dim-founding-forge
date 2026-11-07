@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { AuthLoading } from "@/components/dim/AuthLoading";
+import { AppPageSkeleton } from "@/components/dim/AppPageSkeleton";
 import { SessionExpired } from "@/components/dim/SessionExpired";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/_authenticated")({
     return { user: data.user };
   },
   pendingMs: 0,
-  pendingComponent: () => <AuthLoading />,
+  pendingComponent: AppPageSkeleton,
   errorComponent: () => (
     <SessionExpired
       title="We couldn't verify your session"
