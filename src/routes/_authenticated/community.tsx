@@ -73,7 +73,6 @@ function Community() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [space, setSpace] = useState<string | null>(null);
-  const [mine, setMine] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState("");
@@ -261,18 +260,10 @@ function Community() {
     await queryClient.invalidateQueries({ queryKey: ["community"] });
   }
 
-  const visible = (d?.posts ?? []).filter((p) => (mine ? p.user_id === userId : true));
+  const visible = d?.posts ?? [];
 
   const railChip =
     "inline-flex h-10 shrink-0 snap-start items-center gap-2 rounded-full border border-primary/20 bg-card px-4 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none";
-
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
-      block: "start",
-    });
 
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
@@ -296,17 +287,9 @@ function Community() {
         <Link to="/notifications" className={railChip}>
           <MessageCircle className="size-4 text-primary" /> My inbox
         </Link>
-        <button
-          type="button"
-          aria-pressed={mine}
-          className={cn(railChip, mine && "border-primary bg-primary/10 text-primary")}
-          onClick={() => {
-            setMine(!mine);
-            scrollTo("feed");
-          }}
-        >
+        <Link to="/activity" className={railChip}>
           <Activity className="size-4 text-primary" /> My activity
-        </button>
+        </Link>
         <Link to="/connect" className={railChip}>
           <UserSearch className="size-4 text-primary" /> Find members
         </Link>
@@ -336,7 +319,7 @@ function Community() {
             DIM Community
           </p>
           <h1 className="mt-1 font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-            {mine ? "My activity" : "Community feed"}
+            Community feed
           </h1>
         </div>
       </header>

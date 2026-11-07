@@ -105,6 +105,7 @@ export const NAV_GROUPS: { group: string; items: NavItem[] }[] = [
     group: "Personal",
     items: [
       { label: "My Inbox", to: "/inbox", icon: "messages-square" },
+      { label: "My Activity", to: "/activity", icon: "activity" },
       { label: "My Portfolio", to: "/portfolio", icon: "folder-open" },
       { label: "Achievements", to: "/achievements", icon: "award" },
       { label: "Progress", to: "/progress", icon: "chart-no-axes-column" },

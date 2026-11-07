@@ -21,6 +21,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SocietyRouteImport } from './routes/society'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedBuildRouteImport } from './routes/_authenticated/build'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
 import { Route as AuthenticatedComingSoonRouteImport } from './routes/_authenticated/coming-soon'
@@ -112,6 +113,11 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBuildRoute = AuthenticatedBuildRouteImport.update({
   id: '/build',
   path: '/build',
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/coming-soon': typeof AuthenticatedComingSoonRoute
@@ -323,6 +330,7 @@ export interface FileRoutesByTo {
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/coming-soon': typeof AuthenticatedComingSoonRoute
@@ -368,6 +376,7 @@ export interface FileRoutesById {
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
+  '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/build': typeof AuthenticatedBuildRoute
   '/_authenticated/career': typeof AuthenticatedCareerRoute
   '/_authenticated/coming-soon': typeof AuthenticatedComingSoonRoute
@@ -413,6 +422,7 @@ export interface FileRouteTypes {
     | '/society'
     | '/terms'
     | '/achievements'
+    | '/activity'
     | '/build'
     | '/career'
     | '/coming-soon'
@@ -456,6 +466,7 @@ export interface FileRouteTypes {
     | '/society'
     | '/terms'
     | '/achievements'
+    | '/activity'
     | '/build'
     | '/career'
     | '/coming-soon'
@@ -500,6 +511,7 @@ export interface FileRouteTypes {
     | '/society'
     | '/terms'
     | '/_authenticated/achievements'
+    | '/_authenticated/activity'
     | '/_authenticated/build'
     | '/_authenticated/career'
     | '/_authenticated/coming-soon'
@@ -634,6 +646,13 @@ declare module '@tanstack/react-router' {
       path: '/achievements'
       fullPath: '/achievements'
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/activity': {
+      id: '/_authenticated/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/build': {
@@ -851,6 +870,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
+  AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedBuildRoute: typeof AuthenticatedBuildRoute
   AuthenticatedCareerRoute: typeof AuthenticatedCareerRoute
   AuthenticatedComingSoonRoute: typeof AuthenticatedComingSoonRoute
@@ -880,6 +900,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
+  AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedBuildRoute: AuthenticatedBuildRoute,
   AuthenticatedCareerRoute: AuthenticatedCareerRoute,
   AuthenticatedComingSoonRoute: AuthenticatedComingSoonRoute,
