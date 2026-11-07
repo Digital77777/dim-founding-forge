@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, CircleCheck, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { AppShell } from "@/components/dim/AppShell";
@@ -119,26 +119,182 @@ const ROADMAP_FLOW = [
 function CareerPage() {
   return (
     <AppShell>
-      <div className="space-y-16 pb-4 sm:space-y-24">
-        <Hero />
-        <Problem />
-        <Advisor />
-        <Roadmap />
-        <Features />
-        <Journey />
-        <DashboardPreview />
-        <Tools />
-        <PortfolioToOpportunity />
-        <ConnectSection />
-        <Opportunities />
-        <Audiences />
-        <Ecosystem />
-        <ValueProp />
-        <Personalization />
-        <HubContent />
-        <FinalCta />
-      </div>
+      <CareerWorkspace />
     </AppShell>
+  );
+}
+
+function CareerWorkspace() {
+  const primaryFeatures = CAREER_FEATURES.slice(0, 3);
+  const supportingFeatures = CAREER_FEATURES.slice(3);
+
+  return (
+    <div className="space-y-8 pb-4 sm:space-y-12">
+      <section className="rounded-3xl bg-elite p-6 text-ink-foreground sm:p-10">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-gold">
+          DIM Career
+        </p>
+        <h1 className="mt-3 max-w-2xl font-display text-3xl font-bold leading-tight sm:text-5xl">
+          One clear next step for your career.
+        </h1>
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-ink-foreground/75 sm:text-base">
+          Start with your goal, build the right proof, and prepare for the opportunities that fit
+          you. You can return to every career tool whenever you need it.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button asChild>
+            <Link to="/roadmap">
+              Start my career path <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link to="/profile">Update my profile</Link>
+          </Button>
+        </div>
+      </section>
+
+      <section aria-labelledby="career-progress-title">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+              Your path
+            </p>
+            <h2 id="career-progress-title" className="mt-2 font-display text-2xl font-bold">
+              Follow the simple flow
+            </h2>
+          </div>
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            Step 1 of 4
+          </span>
+        </div>
+        <ol className="mt-5 grid gap-3 sm:grid-cols-4">
+          {["Set your goal", "Build skills", "Show your work", "Find opportunities"].map(
+            (step, index) => (
+              <li
+                key={step}
+                className={cn(
+                  "rounded-2xl border p-4",
+                  index === 0 ? "border-primary/40 bg-primary/10" : "border-border bg-card",
+                )}
+              >
+                <span
+                  className={cn(
+                    "grid size-7 place-items-center rounded-full text-xs font-bold",
+                    index === 0
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {index === 0 ? "1" : <Check className="size-3.5" aria-hidden />}
+                </span>
+                <p className="mt-3 text-sm font-semibold">{step}</p>
+              </li>
+            ),
+          )}
+        </ol>
+      </section>
+
+      <section aria-labelledby="career-start-title">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+              Start here
+            </p>
+            <h2 id="career-start-title" className="mt-2 font-display text-2xl font-bold">
+              Choose one action
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              You do not need to use everything at once.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {primaryFeatures.map((feature, index) => (
+            <Link
+              key={feature.n}
+              to={dest(feature.cta.to)}
+              className={cn(
+                "group rounded-3xl border p-5 transition-shadow hover:shadow-lift",
+                index === 0 ? "border-primary/40 bg-primary/5" : "border-border bg-card",
+              )}
+            >
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                0{index + 1}
+              </span>
+              <h3 className="mt-4 font-display text-xl font-bold">{feature.name}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{feature.description}</p>
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                {feature.cta.label}{" "}
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden
+                />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="rounded-3xl border border-border bg-card"
+        aria-labelledby="career-tools-title"
+      >
+        <details>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 [&::-webkit-details-marker]:hidden sm:p-6">
+            <span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+                More support
+              </span>
+              <span id="career-tools-title" className="mt-1 block font-display text-xl font-bold">
+                Explore all career tools
+              </span>
+              <span className="mt-1 block text-sm text-muted-foreground">
+                Open this only when you are ready for the next layer.
+              </span>
+            </span>
+            <ChevronDown className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+          </summary>
+          <div className="grid gap-3 border-t border-border p-5 sm:grid-cols-2 sm:p-6">
+            {supportingFeatures.map((feature) => (
+              <Link
+                key={feature.n}
+                to={dest(feature.cta.to)}
+                className="flex items-start gap-3 rounded-2xl border border-border p-4 transition-colors hover:border-primary/40 hover:bg-muted/30"
+              >
+                <CircleCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                <span className="min-w-0">
+                  <span className="block font-semibold">{feature.name}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">
+                    {feature.description}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </details>
+      </section>
+
+      <section className="rounded-3xl bg-muted/50 p-6 sm:p-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+          Need direction?
+        </p>
+        <h2 className="mt-2 font-display text-2xl font-bold">
+          Your next step is always available.
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+          Update your profile, revisit your roadmap, or open the community when you want another
+          perspective.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button asChild size="sm">
+            <Link to="/roadmap">Open roadmap</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/community">Ask the community</Link>
+          </Button>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -276,7 +432,10 @@ function Advisor() {
           {[
             { k: "Career goal", v: "AI Product Manager" },
             { k: "Current skills", v: "AI • Research • Communication" },
-            { k: "Potential skill gaps", v: "Product Strategy · AI Product Development · Data Analysis" },
+            {
+              k: "Potential skill gaps",
+              v: "Product Strategy · AI Product Development · Data Analysis",
+            },
             { k: "Recommended next step", v: "AI Product Management Foundations" },
           ].map((row) => (
             <div key={row.k} className="rounded-2xl border border-border bg-background p-4">
@@ -429,14 +588,18 @@ function Journey() {
                   aria-expanded={isOpen}
                   className={cn(
                     "w-full rounded-3xl border bg-card p-5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    isOpen ? "border-primary/40 shadow-lift" : "border-border hover:border-primary/30",
+                    isOpen
+                      ? "border-primary/40 shadow-lift"
+                      : "border-border hover:border-primary/30",
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <span
                       className={cn(
                         "grid size-9 place-items-center rounded-2xl transition-transform",
-                        isOpen ? "scale-105 bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
+                        isOpen
+                          ? "scale-105 bg-primary/15 text-primary"
+                          : "bg-muted text-muted-foreground",
                       )}
                     >
                       <Icon name={s.icon} className="size-4" />
@@ -657,10 +820,7 @@ function ConnectSection() {
   ];
   return (
     <section>
-      <SectionHeading
-        eyebrow="People"
-        title="Your Career Doesn't Have to Be a Solo Journey."
-      />
+      <SectionHeading eyebrow="People" title="Your Career Doesn't Have to Be a Solo Journey." />
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         {cards.map((c) => (
           <article key={c.title} className="rounded-3xl border border-border bg-card p-6">
@@ -710,10 +870,16 @@ function Opportunities() {
 function Audiences() {
   return (
     <section>
-      <SectionHeading eyebrow="Where you're starting from" title="DIM Career for Different People." />
+      <SectionHeading
+        eyebrow="Where you're starting from"
+        title="DIM Career for Different People."
+      />
       <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {CAREER_AUDIENCES.map((a) => (
-          <article key={a.title} className="flex flex-col rounded-3xl border border-border bg-card p-6">
+          <article
+            key={a.title}
+            className="flex flex-col rounded-3xl border border-border bg-card p-6"
+          >
             <h3 className="font-display text-lg font-bold">{a.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{a.line}</p>
             <ul className="mt-4 grid gap-1.5 text-sm">
@@ -824,14 +990,7 @@ function HubContent() {
         lead="What do I need to become job-ready and accelerate my career?"
       />
       <div className="mt-2">
-        <HubPage
-          bare
-          hub="career"
-          eyebrow="Career"
-          title="Career Hub"
-          description=""
-          question=""
-        />
+        <HubPage bare hub="career" eyebrow="Career" title="Career Hub" description="" question="" />
       </div>
     </section>
   );
