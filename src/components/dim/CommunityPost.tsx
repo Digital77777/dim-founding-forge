@@ -9,8 +9,7 @@ import {
   Play,
   Send,
 } from "lucide-react";
-import { useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
 
 import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { youtubeEmbedUrl, youtubeId, youtubeThumb } from "@/lib/reels";
@@ -273,19 +272,44 @@ export function MediaPostCard({
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
   const [ytPlaying, setYtPlaying] = useState(false);
+  const [inView, setInView] = useState(false);
+  const mediaContainerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const yt = post.media_url ? youtubeId(post.media_url) : null;
+
+  useEffect(() => {
+    const container = mediaContainerRef.current;
+    if (!container) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting && entry.intersectionRatio >= 0.6),
+      { threshold: [0, 0.6, 1] },
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || post.media_type !== "video") return;
+    if (inView) {
+      video.muted = true;
+      void video.play().catch(() => undefined);
+    } else {
+      video.pause();
+    }
+  }, [inView, post.media_type]);
   return (
     <article className="-mx-4 overflow-hidden border-y border-border bg-card shadow-sm sm:mx-0 sm:rounded-2xl sm:border">
       <div className="px-4 py-3">
         <AuthorRow author={h.authorFor(post.user_id)} post={post} compact />
       </div>
 
-      <div className="relative w-full bg-ink">
+      <div ref={mediaContainerRef} className="relative w-full bg-ink">
         {yt ? (
-          ytPlaying ? (
+          ytPlaying || inView ? (
             <div className="aspect-video w-full">
               <iframe
-                src={youtubeEmbedUrl(yt, { autoplay: true, muted: false })}
+                src={youtubeEmbedUrl(yt, { autoplay: true, muted: !ytPlaying })}
                 title={post.title ?? "Community reel"}
                 className="size-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -326,7 +350,9 @@ export function MediaPostCard({
               className="group relative block aspect-[4/5] w-full"
             >
               <video
+                ref={videoRef}
                 src={mediaUrl}
+                autoPlay={inView}
                 muted
                 playsInline
                 preload="metadata"
@@ -356,7 +382,6 @@ export function MediaPostCard({
           </div>
         )}
       </div>
-
 
       <div className="flex items-center gap-4 px-4 pt-3">
         <button
