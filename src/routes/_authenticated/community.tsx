@@ -261,7 +261,7 @@ function Community() {
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
       <div
-        className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex w-full snap-x snap-proximity gap-2 overflow-x-scroll overscroll-x-contain scroll-smooth px-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Community features"
       >
         <button type="button" className={railChip} onClick={() => setComposerOpen(true)}>
