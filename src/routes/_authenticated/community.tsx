@@ -4,10 +4,8 @@ import {
   Activity,
   Calendar,
   ImagePlus,
-  Lightbulb,
   MessageCircle,
   Play,
-  TrendingUp,
   Users,
   UserSearch,
   X,
@@ -61,11 +59,6 @@ export const Route = createFileRoute("/_authenticated/community")({
   }),
   component: Community,
 });
-
-const QUICK_LINKS = [
-  { icon: TrendingUp, label: "Progress", to: "/progress" as const },
-  { icon: Lightbulb, label: "AI Tools", to: "/tools" as const },
-];
 
 function Community() {
   const { userId } = useMember();
@@ -263,42 +256,26 @@ function Community() {
   const visible = d?.posts ?? [];
 
   const railChip =
-    "inline-flex h-10 shrink-0 snap-start items-center gap-2 rounded-full border border-primary/20 bg-card px-4 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none";
+    "inline-flex h-9 min-w-0 shrink-0 snap-start items-center justify-center gap-1.5 rounded-full border border-primary/20 bg-card px-2 text-[11px] font-semibold whitespace-nowrap text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none sm:px-3 sm:text-xs";
 
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
       <div
-        className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="grid grid-cols-4 gap-1.5 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex sm:gap-2"
         aria-label="Community features"
       >
-        <button
-          type="button"
-          className={cn(
-            railChip,
-            "border-transparent bg-ember text-primary-foreground shadow-glow hover:bg-ember",
-          )}
-          onClick={() => setComposerOpen(true)}
-        >
-          <ImagePlus className="size-4" /> Create a post
-        </button>
         <Link to="/events" className={railChip}>
-          <Calendar className="size-4 text-primary" /> Browse events
+          <Calendar className="size-3.5 shrink-0 text-primary sm:size-4" /> Browse events
         </Link>
-        <Link to="/notifications" className={railChip}>
-          <MessageCircle className="size-4 text-primary" /> My inbox
+        <Link to="/inbox" className={railChip}>
+          <MessageCircle className="size-3.5 shrink-0 text-primary sm:size-4" /> My inbox
         </Link>
         <Link to="/activity" className={railChip}>
-          <Activity className="size-4 text-primary" /> My activity
+          <Activity className="size-3.5 shrink-0 text-primary sm:size-4" /> My activity
         </Link>
         <Link to="/connect" className={railChip}>
-          <UserSearch className="size-4 text-primary" /> Find members
+          <UserSearch className="size-3.5 shrink-0 text-primary sm:size-4" /> Find members
         </Link>
-        {QUICK_LINKS.map((item) => (
-          <Link key={item.label} to={item.to} className={railChip}>
-            <item.icon className="size-4 text-primary" /> {item.label}
-          </Link>
-        ))}
-        <span className="w-1 shrink-0" aria-hidden />
       </div>
     </div>
   );
