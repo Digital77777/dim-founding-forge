@@ -31,6 +31,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
 import { Route as AuthenticatedEliteBetaRouteImport } from './routes/_authenticated/elite-beta'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -161,6 +162,11 @@ const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMarketplaceRoute =
   AuthenticatedMarketplaceRouteImport.update({
     id: '/marketplace',
@@ -284,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/earn': typeof AuthenticatedEarnRoute
   '/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/earn': typeof AuthenticatedEarnRoute
   '/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/_authenticated/earn': typeof AuthenticatedEarnRoute
   '/_authenticated/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -414,6 +423,7 @@ export interface FileRouteTypes {
     | '/earn'
     | '/elite-beta'
     | '/events'
+    | '/inbox'
     | '/marketplace'
     | '/notifications'
     | '/onboarding'
@@ -456,6 +466,7 @@ export interface FileRouteTypes {
     | '/earn'
     | '/elite-beta'
     | '/events'
+    | '/inbox'
     | '/marketplace'
     | '/notifications'
     | '/onboarding'
@@ -499,6 +510,7 @@ export interface FileRouteTypes {
     | '/_authenticated/earn'
     | '/_authenticated/elite-beta'
     | '/_authenticated/events'
+    | '/_authenticated/inbox'
     | '/_authenticated/marketplace'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
@@ -694,6 +706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/marketplace': {
       id: '/_authenticated/marketplace'
       path: '/marketplace'
@@ -842,6 +861,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
   AuthenticatedEliteBetaRoute: typeof AuthenticatedEliteBetaRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -870,6 +890,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEarnRoute: AuthenticatedEarnRoute,
   AuthenticatedEliteBetaRoute: AuthenticatedEliteBetaRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
