@@ -261,9 +261,12 @@ function Community() {
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
       <div
-        className="grid grid-cols-4 gap-1.5 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex sm:gap-2"
+        className="grid grid-cols-5 gap-1.5 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex sm:gap-2"
         aria-label="Community features"
       >
+        <button type="button" className={railChip} onClick={() => setComposerOpen(true)}>
+          <ImagePlus className="size-3.5 shrink-0 text-primary sm:size-4" /> Create a post
+        </button>
         <Link to="/events" className={railChip}>
           <Calendar className="size-3.5 shrink-0 text-primary sm:size-4" /> Browse events
         </Link>
