@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { AuthLoading } from "@/components/dim/AuthLoading";
 import { BETA_AVAILABILITY } from "@/lib/dim";
 
@@ -18,18 +17,20 @@ const DESCRIPTION =
 export const Route = createFileRoute("/auth")({
   staticData: { sitemap: false },
   ssr: false,
-  validateSearch: (search: Record<string, unknown>): {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): {
     reason?: string;
     redirect?: string;
     mode?: "signin";
   } => {
-    const reason = typeof search['reason'] === "string" ? search['reason'] : undefined;
-    const raw = typeof search['redirect'] === "string" ? search['redirect'] : undefined;
+    const reason = typeof search["reason"] === "string" ? search["reason"] : undefined;
+    const raw = typeof search["redirect"] === "string" ? search["redirect"] : undefined;
     const redirect = raw?.startsWith("/") ? raw : undefined;
     return {
       ...(reason ? { reason } : {}),
       ...(redirect ? { redirect } : {}),
-      ...(search['mode'] === "signin" ? { mode: "signin" as const } : {}),
+      ...(search["mode"] === "signin" ? { mode: "signin" as const } : {}),
     };
   },
   head: () => ({
@@ -48,7 +49,9 @@ function AuthPage() {
   const { reason, redirect, mode: initialMode } = Route.useSearch();
   const expired = reason === "expired";
   const target = redirect && redirect !== "/auth" ? redirect : "/community";
-  const [mode, setMode] = useState<"signup" | "signin">(expired || initialMode === "signin" ? "signin" : "signup");
+  const [mode, setMode] = useState<"signup" | "signin">(
+    expired || initialMode === "signin" ? "signin" : "signup",
+  );
   const [resolving, setResolving] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -106,24 +109,22 @@ function AuthPage() {
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    callbackUrl.searchParams.set("redirect", target);
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: callbackUrl.toString(),
+      },
     });
-    if (result.error) {
+    if (error) {
       toast.error("Google sign-in failed. Try again.");
-      return;
     }
-    if (result.redirected) return;
-    setRedirecting(true);
-    navigate({ to: target, replace: true });
   }
 
   if (redirecting || resolving) {
-    return (
-      <AuthLoading
-        label={redirecting ? "Signing you in…" : "Checking your session…"}
-      />
-    );
+    return <AuthLoading label={redirecting ? "Signing you in…" : "Checking your session…"} />;
   }
 
   return (
@@ -228,9 +229,7 @@ function AuthPage() {
             className="mt-6 w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
             onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
           >
-            {mode === "signup"
-              ? "Already a member? Sign in"
-              : "New here? Claim a founding place"}
+            {mode === "signup" ? "Already a member? Sign in" : "New here? Claim a founding place"}
           </button>
         </div>
       </div>

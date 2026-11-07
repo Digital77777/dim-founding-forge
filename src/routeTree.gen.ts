@@ -39,6 +39,7 @@ import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as ExploreIndexRouteImport } from './routes/explore.index'
 import { Route as ExploreAreaRouteImport } from './routes/explore.$area'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
@@ -203,6 +204,11 @@ const AuthenticatedRoadmapRoute = AuthenticatedRoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const ExploreIndexRoute = ExploreIndexRouteImport.update({
   id: '/explore/',
   path: '/explore/',
@@ -259,7 +265,7 @@ const AuthenticatedToolsSlugRoute = AuthenticatedToolsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
@@ -286,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/explore/$area': typeof ExploreAreaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/explore/': typeof ExploreIndexRoute
@@ -300,7 +307,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
@@ -327,6 +334,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/explore/$area': typeof ExploreAreaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/explore': typeof ExploreIndexRoute
@@ -343,7 +351,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/explore/$area': typeof ExploreAreaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/explore/': typeof ExploreIndexRoute
@@ -413,6 +422,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/roadmap'
+    | '/auth/callback'
     | '/explore/$area'
     | '/insights/$slug'
     | '/explore/'
@@ -454,6 +464,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/roadmap'
+    | '/auth/callback'
     | '/explore/$area'
     | '/insights/$slug'
     | '/explore'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/progress'
     | '/_authenticated/roadmap'
+    | '/auth/callback'
     | '/explore/$area'
     | '/insights/$slug'
     | '/explore/'
@@ -512,7 +524,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ContactRoute: typeof ContactRoute
   EliteRoute: typeof EliteRoute
   OrganisationsRoute: typeof OrganisationsRoute
@@ -738,6 +750,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRoadmapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/explore/': {
       id: '/explore/'
       path: '/explore'
@@ -870,11 +889,21 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ContactRoute: ContactRoute,
   EliteRoute: EliteRoute,
   OrganisationsRoute: OrganisationsRoute,
