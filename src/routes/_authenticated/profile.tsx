@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/dim/AppShell";
 import { PageHeader } from "@/components/dim/PageHeader";
 import { FoundingBadge, foundingLabel } from "@/components/dim/FoundingBadge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +36,8 @@ function ProfilePage() {
     is_public: true,
   });
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!profile) return;
@@ -58,6 +61,40 @@ function ProfilePage() {
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
+
+  async function uploadAvatar(file: File) {
+    if (!userId) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Choose an image file for your profile picture.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Profile pictures must be smaller than 5 MB.");
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const extension = file.type.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+      const path = `avatars/${userId}/${crypto.randomUUID()}.${extension}`;
+      const { error: uploadError } = await supabase.storage
+        .from("community-media")
+        .upload(path, file, { contentType: file.type, cacheControl: "3600" });
+      if (uploadError) throw uploadError;
+      const { data: publicData } = supabase.storage.from("community-media").getPublicUrl(path);
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicData.publicUrl })
+        .eq("id", userId);
+      if (profileError) throw profileError;
+      await invalidateMember();
+      toast.success("Profile picture updated.");
+    } catch {
+      toast.error("Could not update your profile picture.");
+    } finally {
+      setUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+    }
+  }
 
   async function save() {
     if (!userId) return;
@@ -107,6 +144,41 @@ function ProfilePage() {
         title="Your DIM profile"
         description="One profile across the whole ecosystem — learning, building, community and career."
       />
+
+      <section className="mt-6 flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
+        <Avatar className="size-20 border-4 border-background shadow-md">
+          <AvatarImage src={profile?.avatar_url ?? undefined} alt="Your profile picture" />
+          <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
+            {(profile?.full_name ?? userId ?? "DIM").slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold">Profile picture</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Shown next to your posts, reels and member profile.
+          </p>
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void uploadAvatar(file);
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            disabled={uploadingAvatar}
+            onClick={() => avatarInputRef.current?.click()}
+          >
+            {uploadingAvatar ? "Uploading…" : "Upload picture"}
+          </Button>
+        </div>
+      </section>
 
       <div className="mt-6 rounded-2xl border border-gold/40 bg-gold/8 p-5">
         <FoundingBadge number={membership?.founding_number ?? null} size="md" showNumber={false} />
