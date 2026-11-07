@@ -373,7 +373,7 @@ export function MediaPostCard({
               src={mediaUrl}
               alt={post.title ?? "Community post"}
               loading="lazy"
-              className="aspect-[4/5] size-full object-cover"
+              className="block h-auto max-h-[70vh] w-full bg-muted object-contain"
             />
           )
         ) : (
