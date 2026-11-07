@@ -75,7 +75,13 @@ function MenuSheet({
           <X className="size-5" />
         </Button>
         <h2 className="font-display text-lg font-extrabold">Menu</h2>
-        <Button variant="ghost" size="icon" asChild className="ml-auto" aria-label="Profile settings">
+        <Button
+          variant="ghost"
+          size="icon"
+          asChild
+          className="ml-auto"
+          aria-label="Profile settings"
+        >
           <Link to="/profile" onClick={onClose}>
             <Settings className="size-5" />
           </Link>
@@ -120,7 +126,9 @@ function MenuSheet({
                   <span className="grid size-10 place-items-center rounded-xl bg-muted text-primary">
                     <Icon name={item.icon} className="size-5" />
                   </span>
-                  <span className="mt-2 block text-sm font-semibold leading-tight">{item.label}</span>
+                  <span className="mt-2 block text-sm font-semibold leading-tight">
+                    {item.label}
+                  </span>
                   {item.soon ? (
                     <span className="mt-1 inline-block rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Soon
@@ -194,7 +202,7 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-4">
           <Link to="/dashboard" className="font-display text-sm font-extrabold tracking-[0.22em]">
@@ -263,16 +271,22 @@ export function AppShell({
           <MenuSheet
             onClose={() => setOpen(false)}
             onSignOut={signOut}
-            name={firstName(profile, user) === "there" ? "Your profile" : (profile?.full_name ?? firstName(profile, user))}
+            name={
+              firstName(profile, user) === "there"
+                ? "Your profile"
+                : (profile?.full_name ?? firstName(profile, user))
+            }
             headline={profile?.headline ?? null}
             foundingNumber={membership?.founding_number ?? null}
           />
         ) : null}
 
-        <main className="min-w-0 flex-1 px-4 py-8 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pb-8">{children}</main>
+        <main className="min-w-0 flex-1 overflow-x-clip px-4 py-8 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pb-8">
+          {children}
+        </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 transform-gpu border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
         <ul className="flex items-stretch">
           {TAB_ITEMS.map((item) => {
             const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
