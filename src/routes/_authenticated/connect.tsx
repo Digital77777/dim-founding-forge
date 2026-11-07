@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { MessageCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/dim/AppShell";
 import { PageHeader } from "@/components/dim/PageHeader";
 import { FoundingBadge } from "@/components/dim/FoundingBadge";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useMember } from "@/hooks/use-member";
 
 export const Route = createFileRoute("/_authenticated/connect")({
   staticData: { sitemap: false },
@@ -12,6 +17,25 @@ export const Route = createFileRoute("/_authenticated/connect")({
 });
 
 function Networking() {
+  const { userId } = useMember();
+  const queryClient = useQueryClient();
+  const sendRequest = useMutation({
+    mutationFn: async (recipientId: string) => {
+      if (!userId) throw new Error("Not signed in");
+      const { error } = await (supabase as any).from("message_requests").insert({
+        sender_id: userId,
+        recipient_id: recipientId,
+        message: "I’d like to connect with you on DIM.",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Message request sent.");
+      void queryClient.invalidateQueries({ queryKey: ["member-directory"] });
+    },
+    onError: () => toast.error("This member already has a pending request or cannot be contacted."),
+  });
+
   const data = useQuery({
     queryKey: ["member-directory"],
     queryFn: async () => {
@@ -46,11 +70,23 @@ function Networking() {
             <p className="mt-1 text-sm text-muted-foreground">{p.headline ?? p.location ?? ""}</p>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {(p.skills ?? []).slice(0, 4).map((s) => (
-                <span key={s} className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold">
+                <span
+                  key={s}
+                  className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold"
+                >
                   {s}
                 </span>
               ))}
             </div>
+            <Button
+              className="mt-4 w-full"
+              variant="outline"
+              onClick={() => sendRequest.mutate(p.id)}
+              disabled={sendRequest.isPending || p.id === userId}
+            >
+              <MessageCircle className="size-4" />
+              {p.id === userId ? "Your profile" : "Message request"}
+            </Button>
           </article>
         ))}
         {!data.isLoading && (data.data?.profiles ?? []).length === 0 ? (
