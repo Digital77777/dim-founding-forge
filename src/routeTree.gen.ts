@@ -52,6 +52,7 @@ import { Route as AuthenticatedReelsIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedReelsCreateRouteImport } from './routes/_authenticated/reels.create'
 import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
 import { Route as AuthenticatedToolsSlugRouteImport } from './routes/_authenticated/tools.$slug'
+import { Route as ApiCommunityAgentsDailyRouteImport } from './routes/api/community-agents.daily'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -273,6 +274,11 @@ const AuthenticatedToolsSlugRoute = AuthenticatedToolsSlugRouteImport.update({
   path: '/tools/$slug',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiCommunityAgentsDailyRoute = ApiCommunityAgentsDailyRouteImport.update({
+  id: '/api/community-agents/daily',
+  path: '/api/community-agents/daily',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
+  '/api/community-agents/daily': typeof ApiCommunityAgentsDailyRoute
   '/learn/': typeof AuthenticatedLearnIndexRoute
   '/reels/': typeof AuthenticatedReelsIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
@@ -358,6 +365,7 @@ export interface FileRoutesByTo {
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
+  '/api/community-agents/daily': typeof ApiCommunityAgentsDailyRoute
   '/learn': typeof AuthenticatedLearnIndexRoute
   '/reels': typeof AuthenticatedReelsIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
@@ -404,6 +412,7 @@ export interface FileRoutesById {
   '/_authenticated/learn/$course': typeof AuthenticatedLearnCourseRoute
   '/_authenticated/reels/create': typeof AuthenticatedReelsCreateRoute
   '/_authenticated/tools/$slug': typeof AuthenticatedToolsSlugRoute
+  '/api/community-agents/daily': typeof ApiCommunityAgentsDailyRoute
   '/_authenticated/learn/': typeof AuthenticatedLearnIndexRoute
   '/_authenticated/reels/': typeof AuthenticatedReelsIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
@@ -450,6 +459,7 @@ export interface FileRouteTypes {
     | '/learn/$course'
     | '/reels/create'
     | '/tools/$slug'
+    | '/api/community-agents/daily'
     | '/learn/'
     | '/reels/'
     | '/tools/'
@@ -494,6 +504,7 @@ export interface FileRouteTypes {
     | '/learn/$course'
     | '/reels/create'
     | '/tools/$slug'
+    | '/api/community-agents/daily'
     | '/learn'
     | '/reels'
     | '/tools'
@@ -539,6 +550,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learn/$course'
     | '/_authenticated/reels/create'
     | '/_authenticated/tools/$slug'
+    | '/api/community-agents/daily'
     | '/_authenticated/learn/'
     | '/_authenticated/reels/'
     | '/_authenticated/tools/'
@@ -560,6 +572,7 @@ export interface RootRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   ExploreIndexRoute: typeof ExploreIndexRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
+  ApiCommunityAgentsDailyRoute: typeof ApiCommunityAgentsDailyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -865,6 +878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedToolsSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/community-agents/daily': {
+      id: '/api/community-agents/daily'
+      path: '/api/community-agents/daily'
+      fullPath: '/api/community-agents/daily'
+      preLoaderRoute: typeof ApiCommunityAgentsDailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -957,6 +977,7 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsSlugRoute: InsightsSlugRoute,
   ExploreIndexRoute: ExploreIndexRoute,
   InsightsIndexRoute: InsightsIndexRoute,
+  ApiCommunityAgentsDailyRoute: ApiCommunityAgentsDailyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
