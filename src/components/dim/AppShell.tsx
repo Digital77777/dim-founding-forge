@@ -165,22 +165,11 @@ export function AppShell({
   const { user, userId, profile, membership } = useMember();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [showFeatureRail, setShowFeatureRail] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
-
-  useEffect(() => {
-    function updateFeatureRail() {
-      setShowFeatureRail(Boolean(scrollHeader));
-    }
-
-    updateFeatureRail();
-    window.addEventListener("scroll", updateFeatureRail, { passive: true });
-    return () => window.removeEventListener("scroll", updateFeatureRail);
-  }, [scrollHeader]);
 
   const unread = useQuery({
     queryKey: ["unread-notifications", userId],
@@ -247,16 +236,7 @@ export function AppShell({
           </div>
         </div>
         {scrollHeader ? (
-          <div
-            aria-hidden={!showFeatureRail}
-            inert={!showFeatureRail}
-            className={cn(
-              "grid overflow-hidden border-t border-border bg-background/95 shadow-sm transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none",
-              showFeatureRail
-                ? "grid-rows-[1fr] opacity-100"
-                : "pointer-events-none grid-rows-[0fr] opacity-0",
-            )}
-          >
+          <div className="border-t border-border bg-background/95 shadow-sm">
             <div className="min-h-0">{scrollHeader}</div>
           </div>
         ) : null}
