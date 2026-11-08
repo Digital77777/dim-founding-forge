@@ -75,8 +75,6 @@ function Community() {
   const [composerOpen, setComposerOpen] = useState(false);
   const [feedPage, setFeedPage] = useState(0);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const featureRailRef = useRef<HTMLDivElement>(null);
-  const featureRailDragRef = useRef({ active: false, moved: false, startX: 0, scrollLeft: 0 });
 
   const data = useQuery({
     queryKey: ["community", space, userId, feedPage],
@@ -263,42 +261,8 @@ function Community() {
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
       <div
-        ref={featureRailRef}
-        className="flex w-full cursor-grab snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden active:cursor-grabbing"
+        className="flex w-full min-w-0 cursor-grab snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden active:cursor-grabbing"
         aria-label="Community features"
-        onPointerDown={(event) => {
-          const rail = featureRailRef.current;
-          if (!rail) return;
-          featureRailDragRef.current = {
-            active: true,
-            moved: false,
-            startX: event.clientX,
-            scrollLeft: rail.scrollLeft,
-          };
-          rail.setPointerCapture(event.pointerId);
-        }}
-        onPointerMove={(event) => {
-          const drag = featureRailDragRef.current;
-          const rail = featureRailRef.current;
-          if (!drag.active || !rail) return;
-          const distance = event.clientX - drag.startX;
-          if (Math.abs(distance) > 4) drag.moved = true;
-          rail.scrollLeft = drag.scrollLeft - distance;
-        }}
-        onPointerUp={(event) => {
-          featureRailDragRef.current.active = false;
-          featureRailRef.current?.releasePointerCapture(event.pointerId);
-        }}
-        onPointerCancel={() => {
-          featureRailDragRef.current.active = false;
-        }}
-        onClickCapture={(event) => {
-          if (featureRailDragRef.current.moved) {
-            event.preventDefault();
-            event.stopPropagation();
-            featureRailDragRef.current.moved = false;
-          }
-        }}
       >
         <button type="button" className={railChip} onClick={() => setComposerOpen(true)}>
           <ImagePlus className="size-3.5 shrink-0 text-primary sm:size-4" /> Create a post
