@@ -57,10 +57,21 @@ function Networking() {
   const sendRequest = useMutation({
     mutationFn: async (recipientId: string) => {
       if (!userId) throw new Error("Not signed in");
+      const { data: existing, error: lookupError } = await supabase
+        .from("message_requests")
+        .select("id")
+        .eq("sender_id", userId)
+        .eq("recipient_id", recipientId)
+        .eq("status", "pending")
+        .maybeSingle();
+      if (lookupError) throw lookupError;
+      if (existing) throw new Error("pending_request");
+
       const { error } = await (supabase as any).from("message_requests").insert({
         sender_id: userId,
         recipient_id: recipientId,
         message: "I’d like to connect with you on DIM.",
+        status: "pending",
       });
       if (error) throw error;
     },
@@ -68,7 +79,12 @@ function Networking() {
       toast.success("Message request sent.");
       void queryClient.invalidateQueries({ queryKey: ["member-directory"] });
     },
-    onError: () => toast.error("This member already has a pending request or cannot be contacted."),
+    onError: (error) =>
+      toast.error(
+        error instanceof Error && error.message === "pending_request"
+          ? "You already have a pending request for this member."
+          : "We could not send the request. Please try again.",
+      ),
   });
 
   const data = useQuery({
