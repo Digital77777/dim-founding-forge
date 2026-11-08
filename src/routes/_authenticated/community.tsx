@@ -320,7 +320,7 @@ function Community() {
   );
 
   return (
-    <AppShell>
+    <AppShell scrollHeader={communityScrollHeader}>
       <header className="flex items-end justify-between gap-3">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
@@ -331,10 +331,6 @@ function Community() {
           </h1>
         </div>
       </header>
-
-      <div className="-mx-4 mt-5 border-y border-border/70 bg-muted/20">
-        {communityScrollHeader}
-      </div>
 
       {/* Composer (opened from "Create a post") */}
       <Sheet open={composerOpen} onOpenChange={setComposerOpen}>
