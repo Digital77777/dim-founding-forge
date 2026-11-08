@@ -233,7 +233,7 @@ function ReelCard({
     <div
       ref={wrapRef}
       onPointerDown={revealControls}
-      className="relative h-[100svh] w-full snap-start snap-always overflow-hidden bg-ink"
+      className="relative isolate h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full snap-start snap-always snap-stop-always overflow-hidden bg-ink"
     >
       <ReelMedia
         reel={reel}
@@ -877,7 +877,7 @@ function Reels() {
       ) : (
         <div
           ref={containerRef}
-          className="h-[100svh] snap-y snap-mandatory overflow-y-auto overscroll-contain"
+          className="fixed inset-0 z-20 h-[100dvh] snap-y snap-mandatory overflow-y-auto overscroll-y-contain overscroll-x-none touch-pan-y"
         >
           {reels.map((reel, i) => {
             const liked = (data.data?.likes ?? []).some((l) => l.post_id === reel.id);
