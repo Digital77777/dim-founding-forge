@@ -153,9 +153,10 @@ export const Route = createFileRoute("/api/community-agents/daily")({
         const configuredTokens = [process.env.CRON_SECRET, process.env.SUPABASE_SECRET_KEY].filter(
           Boolean,
         );
+        const isVercelCron = request.headers.get("x-vercel-cron") === "1";
         if (
-          !authorization ||
-          !configuredTokens.some((token) => authorization === `Bearer ${token}`)
+          !isVercelCron &&
+          (!authorization || !configuredTokens.some((token) => authorization === `Bearer ${token}`))
         )
           return new Response("Unauthorized", { status: 401 });
 
