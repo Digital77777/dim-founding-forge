@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import {
-  Bookmark,
+  Archive,
   Clapperboard,
   Eye,
-  Heart,
-  MessageCircle,
+  MessageSquareText,
+  ThumbsUp,
   MoreHorizontal,
   Send,
   Volume2,
@@ -216,7 +216,7 @@ export function TextPostCard({
           {h.likeCount ? (
             <span className="inline-flex items-center gap-1">
               <span className="inline-flex size-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Heart className="size-2.5 fill-current" />
+                <ThumbsUp className="size-2.5 fill-current" />
               </span>
               {h.likeCount}
             </span>
@@ -242,14 +242,14 @@ export function TextPostCard({
             h.liked ? "text-primary" : "text-muted-foreground",
           )}
         >
-          <Heart className={cn("size-4", h.liked && "fill-current")} /> Like
+          <ThumbsUp className={cn("size-4", h.liked && "fill-current")} /> Like
         </button>
         <button
           type="button"
           onClick={() => setShowComments((v) => !v)}
           className="inline-flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted"
         >
-          <MessageCircle className="size-4" /> Comment
+          <MessageSquareText className="size-4" /> Comment
         </button>
       </div>
 
@@ -407,7 +407,7 @@ export function MediaPostCard({
           aria-label="Like"
           className={cn(h.liked ? "text-destructive" : "text-foreground")}
         >
-          <Heart className={cn("size-6", h.liked && "fill-current")} />
+          <ThumbsUp className={cn("size-6", h.liked && "fill-current")} />
         </button>
         <button
           type="button"
@@ -415,7 +415,7 @@ export function MediaPostCard({
           aria-label="Comments"
           className="text-foreground"
         >
-          <MessageCircle className="size-6" />
+          <MessageSquareText className="size-6" />
         </button>
         <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
           <Eye className="size-5" />
@@ -426,7 +426,7 @@ export function MediaPostCard({
           aria-label="Save"
           className={cn("ml-auto", saved ? "text-primary" : "text-foreground")}
         >
-          <Bookmark className={cn("size-6", saved && "fill-current")} />
+          <Archive className={cn("size-6", saved && "fill-current")} />
         </button>
       </div>
 
