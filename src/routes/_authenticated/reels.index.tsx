@@ -198,17 +198,18 @@ function ReelCard({
   const [controlsVisible, setControlsVisible] = useState(true);
 
   const active = index === activeIndex;
-  const clearView = active && playing && !controlsVisible && !sheet;
+  const mediaIsPlaying = reel.youtube ? active : playing;
+  const clearView = active && mediaIsPlaying && !controlsVisible && !sheet;
 
   useEffect(() => {
     if (active) setControlsVisible(true);
   }, [active]);
 
   useEffect(() => {
-    if (!playing || !active || sheet) return;
+    if (!mediaIsPlaying || !active || sheet) return;
     const timer = window.setTimeout(() => setControlsVisible(false), 900);
     return () => window.clearTimeout(timer);
-  }, [active, playing, sheet]);
+  }, [active, mediaIsPlaying, sheet]);
 
   const revealControls = () => setControlsVisible(true);
   const near = Math.abs(index - activeIndex) <= 1;
@@ -246,6 +247,14 @@ function ReelCard({
           toggleRef.current = fn;
         }}
       />
+      {clearView ? (
+        <button
+          type="button"
+          aria-label="Show reel controls"
+          onPointerDown={revealControls}
+          className="absolute inset-0 z-10 cursor-default bg-transparent"
+        />
+      ) : null}
 
       <div
         className={cn(
