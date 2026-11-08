@@ -18,7 +18,6 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 
-import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { initials, timeAgo, type PostAuthor } from "@/components/dim/CommunityPost";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -196,8 +195,22 @@ function ReelCard({
   const [expanded, setExpanded] = useState(false);
   const [sheet, setSheet] = useState(false);
   const [draft, setDraft] = useState("");
+  const [controlsVisible, setControlsVisible] = useState(true);
 
   const active = index === activeIndex;
+  const clearView = active && playing && !controlsVisible && !sheet;
+
+  useEffect(() => {
+    if (active) setControlsVisible(true);
+  }, [active]);
+
+  useEffect(() => {
+    if (!playing || !active || sheet) return;
+    const timer = window.setTimeout(() => setControlsVisible(false), 900);
+    return () => window.clearTimeout(timer);
+  }, [active, playing, sheet]);
+
+  const revealControls = () => setControlsVisible(true);
   const near = Math.abs(index - activeIndex) <= 1;
 
   useEffect(() => {
@@ -219,6 +232,7 @@ function ReelCard({
   return (
     <div
       ref={wrapRef}
+      onPointerDown={revealControls}
       className="relative h-[100svh] w-full snap-start snap-always overflow-hidden bg-ink"
     >
       <ReelMedia
@@ -233,15 +247,28 @@ function ReelCard({
         }}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-ink/80 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent" />
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-ink/80 to-transparent transition-opacity duration-300",
+          clearView && "opacity-0",
+        )}
+      />
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent transition-opacity duration-300",
+          clearView && "opacity-0",
+        )}
+      />
 
       {!playing && !reel.youtube && near ? (
         <button
           type="button"
           onClick={() => toggleRef.current?.()}
           aria-label="Play video"
-          className="absolute inset-0 grid place-items-center"
+          className={cn(
+            "absolute inset-0 grid place-items-center transition-opacity duration-300",
+            clearView && "pointer-events-none opacity-0",
+          )}
         >
           <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur">
             <Play className="size-7 fill-current" />
@@ -249,7 +276,12 @@ function ReelCard({
         </button>
       ) : null}
 
-      <div className="absolute bottom-28 right-3 flex flex-col items-center gap-5 text-ink-foreground">
+      <div
+        className={cn(
+          "absolute bottom-28 right-3 flex flex-col items-center gap-5 text-ink-foreground transition-opacity duration-300",
+          clearView && "pointer-events-none opacity-0",
+        )}
+      >
         <button
           type="button"
           onClick={onToggleLike}
@@ -288,7 +320,12 @@ function ReelCard({
         </button>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 px-4 pb-8">
+      <div
+        className={cn(
+          "absolute inset-x-0 bottom-0 px-4 pb-8 transition-opacity duration-300",
+          clearView && "pointer-events-none opacity-0",
+        )}
+      >
         <div className="flex items-center gap-3">
           <Avatar className="size-10 border border-ink-foreground/30">
             <AvatarImage src={author?.avatar_url ?? undefined} alt="" />
@@ -301,7 +338,6 @@ function ReelCard({
               <span className="truncate text-sm font-semibold text-ink-foreground">
                 {author?.full_name ?? "DIM member"}
               </span>
-              <FoundingBadge number={author?.founding_number ?? null} />
             </div>
             <p className="text-xs text-ink-foreground/70">{timeAgo(reel.created_at)}</p>
           </div>
