@@ -79,14 +79,20 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    const normalizedEmail = email.trim().toLowerCase();
     if (mode === "signup") {
-      const result = await createConfirmedAccount({ data: { email, password, fullName } });
+      const result = await createConfirmedAccount({
+        data: { email: normalizedEmail, password, fullName: fullName.trim() },
+      });
       if (!result.ok) {
         setBusy(false);
         toast.error(result.error);
         return;
       }
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
       setBusy(false);
       if (error) {
         toast.error("Your account was created, but we couldn't sign you in. Please try again.");
