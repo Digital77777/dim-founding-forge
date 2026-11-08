@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthLoading } from "@/components/dim/AuthLoading";
 import { BETA_AVAILABILITY } from "@/lib/dim";
+import { createConfirmedAccount } from "@/lib/auth.functions";
 
 const TITLE = "Join DIM ELITE — Founding 1,000 Beta";
 const DESCRIPTION =
@@ -79,17 +80,16 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: fullName },
-          emailRedirectTo: `${window.location.origin}/community`,
-        },
-      });
+      const result = await createConfirmedAccount({ data: { email, password, fullName } });
+      if (!result.ok) {
+        setBusy(false);
+        toast.error(result.error);
+        return;
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       setBusy(false);
       if (error) {
-        toast.error(error.message);
+        toast.error("Your account was created, but we couldn't sign you in. Please try again.");
         return;
       }
       toast.success("Welcome to DIM ELITE.");
