@@ -47,6 +47,9 @@ function LearnHub() {
           : Promise.resolve({ data: [] }),
         supabase.from("lessons").select("id, module_id"),
       ]);
+      if (paths.error) throw paths.error;
+      if (courses.error) throw courses.error;
+
       return {
         paths: paths.data ?? [],
         courses: courses.data ?? [],
@@ -55,6 +58,8 @@ function LearnHub() {
         lessonCount: (lessons.data ?? []).length,
       };
     },
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
 
   const d = data.data;
@@ -98,6 +103,15 @@ function LearnHub() {
         title="Learning Hub"
         description="Structured paths built around what you want to achieve. Complete lessons, track progress and unlock achievements as you go."
       />
+
+      {data.error ? (
+        <div
+          role="alert"
+          className="mt-6 rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
+          We couldn&apos;t load the course catalog. Refresh the page and try again.
+        </div>
+      ) : null}
 
       <section className="mt-8 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
         <div className="max-w-2xl">
