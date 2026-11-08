@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/learn/")({
 });
 
 function LearnHub() {
-  const { userId } = useMember();
+  const { userId, profile } = useMember();
   const [path, setPath] = useState<string | null>(null);
 
   const data = useQuery({
@@ -63,6 +63,28 @@ function LearnHub() {
   }, {});
 
   const courses = (d?.courses ?? []).filter((c) => !path || c.path_slug === path);
+  const focusTerms = [
+    profile?.career_goal,
+    profile?.industry,
+    ...(profile?.goals ?? []),
+    ...(profile?.interests ?? []),
+    ...(profile?.skills ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const recommendedPath = (d?.paths ?? [])
+    .map((candidate) => ({
+      candidate,
+      score: `${candidate.title} ${candidate.description ?? ""}`
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((word) => word.length > 3 && focusTerms.includes(word)).length,
+    }))
+    .sort((a, b) => b.score - a.score)[0]?.candidate;
+  const recommendedCourse =
+    (d?.courses ?? []).find((course) => course.path_slug === recommendedPath?.slug) ??
+    d?.courses?.[0];
 
   return (
     <AppShell>
@@ -71,6 +93,45 @@ function LearnHub() {
         title="Learning Hub"
         description="Structured paths built around what you want to achieve. Complete lessons, track progress and unlock achievements as you go."
       />
+
+      <section className="mt-8 overflow-hidden rounded-3xl border border-learn/20 bg-gradient-to-br from-learn/10 via-card to-primary/5 p-6 shadow-sm sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-learn">
+              Your next best step
+            </p>
+            <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
+              {profile?.career_goal
+                ? `Build toward ${profile.career_goal}`
+                : "Turn learning into something real"}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              Your path is designed around momentum: learn one useful concept, apply it in a
+              project, and leave with work you can show.
+            </p>
+          </div>
+          {recommendedCourse ? (
+            <Button asChild>
+              <Link to="/learn/$course" params={{ course: recommendedCourse.slug }}>
+                Start recommended course
+              </Link>
+            </Button>
+          ) : null}
+        </div>
+        {recommendedPath ? (
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-border/70 bg-background/70 p-4">
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-learn/15 text-learn">
+              <Icon name={recommendedPath.icon ?? "graduation-cap"} className="size-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Recommended path
+              </p>
+              <p className="truncate font-display font-bold">{recommendedPath.title}</p>
+            </div>
+          </div>
+        ) : null}
+      </section>
 
       <section className="mt-8">
         <h2 className="font-display text-lg font-bold">Learning paths</h2>
@@ -122,7 +183,11 @@ function LearnHub() {
                   <p className="mt-2 text-xs text-muted-foreground">{done} lessons completed</p>
                 </>
               ) : null}
-              <Button className="mt-4" variant={enrolled.has(c.slug) ? "default" : "outline"} asChild>
+              <Button
+                className="mt-4"
+                variant={enrolled.has(c.slug) ? "default" : "outline"}
+                asChild
+              >
                 <Link to="/learn/$course" params={{ course: c.slug }}>
                   {enrolled.has(c.slug) ? "Continue course" : "View course"}
                 </Link>
