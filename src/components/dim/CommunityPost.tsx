@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { youtubeEmbedUrl, youtubeId, youtubeThumb } from "@/lib/reels";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -96,7 +95,6 @@ function AuthorRow({
           <span className="truncate text-sm font-semibold">
             {author?.full_name ?? "DIM member"}
           </span>
-          <FoundingBadge number={author?.founding_number ?? null} />
         </div>
         <p className="text-xs text-muted-foreground">
           {timeAgo(post.created_at)} · {post.space_slug}
@@ -438,9 +436,6 @@ export function MediaPostCard({
         </p>
         {post.title ? <p className="text-sm font-semibold">{post.title}</p> : null}
         <div className="text-sm">
-          <span className="mr-1.5 font-semibold">
-            {h.authorFor(post.user_id)?.full_name ?? "DIM member"}
-          </span>
           <Clamped text={post.body} />
         </div>
         <TagRow tags={post.tags} />
