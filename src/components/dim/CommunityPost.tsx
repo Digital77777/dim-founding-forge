@@ -6,8 +6,9 @@ import {
   Heart,
   MessageCircle,
   MoreHorizontal,
-  Play,
   Send,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -264,6 +265,24 @@ export function TextPostCard({
 }
 
 /** Image / video post — Instagram style card. */
+function SoundToggle({ muted, onToggle }: { muted: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={muted ? "Turn sound on" : "Mute video"}
+      aria-pressed={!muted}
+      className="absolute bottom-3 right-3 z-10 grid size-10 place-items-center rounded-full bg-ink/70 text-ink-foreground backdrop-blur transition hover:bg-ink/90"
+    >
+      {muted ? (
+        <VolumeX className="size-4" aria-hidden />
+      ) : (
+        <Volume2 className="size-4" aria-hidden />
+      )}
+    </button>
+  );
+}
+
 export function MediaPostCard({
   post,
   mediaUrl,
@@ -273,6 +292,7 @@ export function MediaPostCard({
   const [saved, setSaved] = useState(false);
   const [ytPlaying, setYtPlaying] = useState(false);
   const [inView, setInView] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const mediaContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const yt = post.media_url ? youtubeId(post.media_url) : null;
@@ -295,12 +315,12 @@ export function MediaPostCard({
     const video = videoRef.current;
     if (!video || post.media_type !== "video") return;
     if (inView) {
-      video.muted = true;
+      video.muted = isMuted;
       void video.play().catch(() => undefined);
     } else {
       video.pause();
     }
-  }, [inView, post.media_type]);
+  }, [inView, isMuted, post.media_type]);
   return (
     <article className="-mx-4 overflow-hidden border-y border-border bg-card shadow-sm sm:mx-0 sm:rounded-2xl sm:border">
       <div className="px-4 py-3">
@@ -310,23 +330,23 @@ export function MediaPostCard({
       <div ref={mediaContainerRef} className="relative w-full bg-ink">
         {yt ? (
           ytPlaying || inView ? (
-            <div className={cn("w-full", isYoutubeShort ? "aspect-[9/16]" : "aspect-video")}>
+            <div
+              className={cn("relative w-full", isYoutubeShort ? "aspect-[9/16]" : "aspect-video")}
+            >
               <iframe
-                src={youtubeEmbedUrl(yt, { autoplay: true, muted: !ytPlaying })}
+                src={youtubeEmbedUrl(yt, { autoplay: true, muted: isMuted })}
                 title={post.title ?? "Community reel"}
                 className="size-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 loading="lazy"
               />
+              <SoundToggle muted={isMuted} onToggle={() => setIsMuted((value) => !value)} />
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={() => setYtPlaying(true)}
-              aria-label="Play reel"
+            <div
               className={cn(
-                "group relative block w-full",
+                "relative block w-full",
                 isYoutubeShort ? "aspect-[9/16]" : "aspect-video",
               )}
             >
@@ -337,43 +357,36 @@ export function MediaPostCard({
                 className="size-full bg-ink object-contain"
               />
               <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
-              <span className="pointer-events-none absolute inset-0 grid place-items-center">
-                <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur transition group-hover:scale-105">
-                  <Play className="size-7 fill-current" />
-                </span>
-              </span>
               <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
                 <Clapperboard className="size-3.5" /> Reel
               </span>
-            </button>
+            </div>
           )
         ) : mediaUrl ? (
           post.media_type === "video" ? (
-            <Link
-              to="/reels"
-              search={{ post: post.id }}
-              aria-label="Watch in Reels"
-              className="group relative block aspect-[4/5] w-full"
-            >
-              <video
-                ref={videoRef}
-                src={mediaUrl}
-                autoPlay={inView}
-                muted
-                playsInline
-                preload="metadata"
-                className="size-full object-cover"
-              />
-              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
-              <span className="pointer-events-none absolute inset-0 grid place-items-center">
-                <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur transition group-hover:scale-105">
-                  <Play className="size-7 fill-current" />
+            <div className="relative aspect-[4/5] w-full">
+              <Link
+                to="/reels"
+                search={{ post: post.id }}
+                aria-label="Watch in Reels"
+                className="group relative block size-full"
+              >
+                <video
+                  ref={videoRef}
+                  src={mediaUrl}
+                  autoPlay={inView}
+                  muted={isMuted}
+                  playsInline
+                  preload="metadata"
+                  className="size-full object-cover"
+                />
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
+                <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
+                  <Clapperboard className="size-3.5" /> Reel
                 </span>
-              </span>
-              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
-                <Clapperboard className="size-3.5" /> Reel
-              </span>
-            </Link>
+              </Link>
+              <SoundToggle muted={isMuted} onToggle={() => setIsMuted((value) => !value)} />
+            </div>
           ) : (
             <img
               src={mediaUrl}
