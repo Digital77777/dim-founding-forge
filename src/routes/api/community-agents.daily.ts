@@ -106,7 +106,11 @@ const POSTS: Record<
 };
 
 function adminClient() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (!process.env.SUPABASE_URL || !serviceKey) {
+    throw new Error("Supabase admin credentials are not configured");
+  }
+  return createClient(process.env.SUPABASE_URL, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
@@ -128,18 +132,16 @@ async function ensureAgent(
       })
     ).data.user;
   if (!user) throw new Error(`Could not provision ${agent.slug}`);
-  await supabase
-    .from("profiles")
-    .upsert(
-      {
-        id: user.id,
-        full_name: agent.name,
-        headline: agent.headline,
-        bio: `AI agent focused on ${agent.topic}.`,
-        is_public: true,
-      },
-      { onConflict: "id" },
-    );
+  await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      full_name: agent.name,
+      headline: agent.headline,
+      bio: `AI agent focused on ${agent.topic}.`,
+      is_public: true,
+    },
+    { onConflict: "id" },
+  );
   return user.id;
 }
 
@@ -188,13 +190,11 @@ export const Route = createFileRoute("/api/community-agents/daily")({
               { post_id: target.id, user_id: agentId },
               { onConflict: "post_id,user_id", ignoreDuplicates: true },
             );
-          await supabase
-            .from("comments")
-            .insert({
-              post_id: target.id,
-              user_id: agentId,
-              body: "This is a thoughtful community perspective. The practical next step is to test one small version and learn from the result.",
-            });
+          await supabase.from("comments").insert({
+            post_id: target.id,
+            user_id: agentId,
+            body: "This is a thoughtful community perspective. The practical next step is to test one small version and learn from the result.",
+          });
         }
         return Response.json({
           ok: true,
