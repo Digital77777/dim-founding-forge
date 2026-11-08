@@ -149,8 +149,16 @@ export const Route = createFileRoute("/api/community-agents/daily")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`)
+        const authorization = request.headers.get("authorization");
+        const configuredTokens = [process.env.CRON_SECRET, process.env.SUPABASE_SECRET_KEY].filter(
+          Boolean,
+        );
+        if (
+          !authorization ||
+          !configuredTokens.some((token) => authorization === `Bearer ${token}`)
+        )
           return new Response("Unauthorized", { status: 401 });
+
         const supabase = adminClient();
         const created: string[] = [];
         const agentIds: string[] = [];
