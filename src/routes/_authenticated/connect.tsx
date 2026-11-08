@@ -90,14 +90,14 @@ function Networking() {
         title="Connect with people"
         description="Discover members, follow their work and build a network around what you are learning."
       />
-      <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-border bg-card/70 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-8 flex min-w-0 flex-col gap-3 rounded-2xl border border-border bg-card/70 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold">Your professional network</p>
           <p className="text-xs text-muted-foreground">
             Follow people whose work you want to keep up with.
           </p>
         </div>
-        <div className="flex gap-4 text-sm">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
           <span>
             <strong>{data.data?.profiles.length ?? 0}</strong> members
           </span>
@@ -112,7 +112,7 @@ function Networking() {
           return (
             <article
               key={p.id}
-              className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+              className="group min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:p-5"
             >
               <Link
                 to="/members/$userId"
@@ -151,8 +151,9 @@ function Networking() {
                   ))}
                 </div>
               </Link>
-              <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Button
+                  className="min-w-0"
                   variant={isFollowing ? "secondary" : "default"}
                   onClick={() => toggleFollow.mutate(p.id)}
                   disabled={toggleFollow.isPending || p.id === userId}
@@ -160,7 +161,7 @@ function Networking() {
                   {isFollowing ? <Check className="size-4" /> : <UserPlus className="size-4" />}
                   {p.id === userId ? "You" : isFollowing ? "Following" : "Follow"}
                 </Button>
-                <Button variant="outline" asChild>
+                <Button className="min-w-0" variant="outline" asChild>
                   <Link to="/members/$userId" params={{ userId: p.id }}>
                     <MessageCircle className="size-4" />
                     View profile
