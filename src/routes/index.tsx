@@ -26,9 +26,33 @@ export const Route = createFileRoute("/")({
     const { data } = await supabase.auth.getSession();
     if (data.session && typeof window !== "undefined") {
       const lastRoute = window.localStorage.getItem("dim:last-authenticated-route");
-      if (lastRoute && lastRoute.startsWith("/") && !lastRoute.startsWith("//")) {
-        throw redirect({ to: lastRoute as never, replace: true });
+      const safeReturnRoutes = [
+        "/community",
+        "/connect",
+        "/inbox",
+        "/learn",
+        "/profile",
+        "/progress",
+        "/portfolio",
+        "/build",
+        "/tools",
+        "/marketplace",
+        "/dashboard",
+        "/activity",
+      ];
+      let isSafeReturnRoute = Boolean(
+        lastRoute &&
+        safeReturnRoutes.some((route) => lastRoute === route || lastRoute.startsWith(`${route}/`)),
+      );
+      if (isSafeReturnRoute && lastRoute?.startsWith("/learn/")) {
+        const courseSlug = lastRoute.split("/").filter(Boolean).at(-1);
+        const { data: course } = courseSlug
+          ? await supabase.from("courses").select("slug").eq("slug", courseSlug).maybeSingle()
+          : { data: null };
+        isSafeReturnRoute = Boolean(course);
       }
+      if (isSafeReturnRoute) throw redirect({ to: lastRoute as never, replace: true });
+      window.localStorage.removeItem("dim:last-authenticated-route");
       throw redirect({ to: "/community", replace: true });
     }
   },
