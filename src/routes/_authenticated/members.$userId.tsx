@@ -96,13 +96,21 @@ function PublicMemberProfile() {
           </section>
         ) : member ? (
           <>
-            <section className="mt-4 overflow-hidden rounded-3xl border border-border bg-card">
-              <div className="h-28 bg-gradient-to-r from-primary/20 via-primary/5 to-secondary/20" />
+            <section className="mt-4 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+              <div className="h-32 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/.28),transparent_45%),linear-gradient(110deg,hsl(var(--primary)/.14),hsl(var(--secondary)/.12))]" />
               <div className="px-6 pb-6">
                 <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                  <div className="grid size-24 place-items-center rounded-full border-4 border-card bg-primary/10 text-2xl font-bold text-primary">
-                    {initials}
-                  </div>
+                  {member.avatar_url ? (
+                    <img
+                      src={member.avatar_url}
+                      alt={`${member.full_name ?? "Member"} profile`}
+                      className="size-24 rounded-full border-4 border-card object-cover shadow-sm"
+                    />
+                  ) : (
+                    <div className="grid size-24 place-items-center rounded-full border-4 border-card bg-primary/10 text-2xl font-bold text-primary">
+                      {initials}
+                    </div>
+                  )}
                   {viewerId !== userId ? (
                     <div className="flex gap-2">
                       <Button
@@ -146,7 +154,7 @@ function PublicMemberProfile() {
                 </div>
               </div>
             </section>
-            <section className="mt-4 rounded-3xl border border-border bg-card p-6">
+            <section className="mt-4 rounded-3xl border border-border bg-card p-6 shadow-sm">
               <h2 className="font-display text-xl font-bold">About</h2>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
                 {member.bio ?? "This member has not added an introduction yet."}

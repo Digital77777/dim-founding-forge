@@ -76,7 +76,7 @@ function Networking() {
     queryFn: async () => {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, full_name, headline, location, skills")
+        .select("id, full_name, headline, location, skills, avatar_url")
         .eq("is_public", true)
         .limit(60);
       return { profiles: profiles ?? [] };
@@ -90,20 +90,47 @@ function Networking() {
         title="Connect with people"
         description="Discover members, follow their work and build a network around what you are learning."
       />
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-border bg-card/70 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold">Your professional network</p>
+          <p className="text-xs text-muted-foreground">
+            Follow people whose work you want to keep up with.
+          </p>
+        </div>
+        <div className="flex gap-4 text-sm">
+          <span>
+            <strong>{data.data?.profiles.length ?? 0}</strong> members
+          </span>
+          <span>
+            <strong>{following.data?.size ?? 0}</strong> following
+          </span>
+        </div>
+      </div>
+      <section className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {(data.data?.profiles ?? []).map((p) => {
           const isFollowing = following.data?.has(p.id) ?? false;
           return (
-            <article key={p.id} className="rounded-2xl border border-border bg-card p-5">
+            <article
+              key={p.id}
+              className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+            >
               <Link
                 to="/members/$userId"
                 params={{ userId: p.id }}
                 className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <div className="flex items-center gap-3">
-                  <div className="grid size-12 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                    {(p.full_name ?? "DM").slice(0, 2).toUpperCase()}
-                  </div>
+                  {p.avatar_url ? (
+                    <img
+                      src={p.avatar_url}
+                      alt=""
+                      className="size-12 rounded-full object-cover ring-2 ring-primary/10"
+                    />
+                  ) : (
+                    <div className="grid size-12 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                      {(p.full_name ?? "DM").slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <h3 className="truncate font-display font-bold">
                       {p.full_name ?? "DIM member"}
