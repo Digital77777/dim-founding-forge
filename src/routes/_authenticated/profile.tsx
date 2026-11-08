@@ -37,6 +37,9 @@ function ProfilePage() {
   });
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [pendingAvatar, setPendingAvatar] = useState<File | null>(null);
+  const [pendingAvatarUrl, setPendingAvatarUrl] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -62,14 +65,46 @@ function ProfilePage() {
       .map((s) => s.trim())
       .filter(Boolean);
 
+  async function cropToSquare(file: File) {
+    const image = new Image();
+    image.src = URL.createObjectURL(file);
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("Could not read image"));
+    });
+    const size = Math.min(image.naturalWidth, image.naturalHeight);
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 1200;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Could not prepare image editor");
+    context.drawImage(
+      image,
+      (image.naturalWidth - size) / 2,
+      (image.naturalHeight - size) / 2,
+      size,
+      size,
+      0,
+      0,
+      1200,
+      1200,
+    );
+    URL.revokeObjectURL(image.src);
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.92),
+    );
+    if (!blob) throw new Error("Could not crop image");
+    return new File([blob], `${file.name.replace(/\\.[^.]+$/, "")}.jpg`, { type: "image/jpeg" });
+  }
+
   async function uploadAvatar(file: File) {
     if (!userId) return;
     if (!file.type.startsWith("image/")) {
       toast.error("Choose an image file for your profile picture.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Profile pictures must be smaller than 5 MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Profile pictures must be smaller than 10 MB.");
       return;
     }
     setUploadingAvatar(true);
@@ -78,7 +113,11 @@ function ProfilePage() {
       const path = `avatars/${userId}/${crypto.randomUUID()}.${extension}`;
       const { error: uploadError } = await supabase.storage
         .from("community-media")
-        .upload(path, file, { contentType: file.type, cacheControl: "3600" });
+        .upload(path, file, {
+          contentType: file.type || "application/octet-stream",
+          cacheControl: "3600",
+          upsert: true,
+        });
       if (uploadError) throw uploadError;
       const { data: publicData } = supabase.storage.from("community-media").getPublicUrl(path);
       const { error: profileError } = await supabase
@@ -92,6 +131,9 @@ function ProfilePage() {
       toast.error("Could not update your profile picture.");
     } finally {
       setUploadingAvatar(false);
+      setPendingAvatar(null);
+      if (pendingAvatarUrl) URL.revokeObjectURL(pendingAvatarUrl);
+      setPendingAvatarUrl(null);
       if (avatarInputRef.current) avatarInputRef.current.value = "";
     }
   }
@@ -160,11 +202,19 @@ function ProfilePage() {
           <input
             ref={avatarInputRef}
             type="file"
-            accept="image/png,image/jpeg,image/webp"
+            accept="image/*"
             className="sr-only"
             onChange={(event) => {
               const file = event.target.files?.[0];
-              if (file) void uploadAvatar(file);
+              if (!file) return;
+              if (!file.type.startsWith("image/")) {
+                toast.error("Choose an image file for your profile picture.");
+                return;
+              }
+              setPendingAvatar(file);
+              setPendingAvatarUrl(URL.createObjectURL(file));
+              setCropOpen(true);
+              event.target.value = "";
             }}
           />
           <Button
@@ -175,10 +225,77 @@ function ProfilePage() {
             disabled={uploadingAvatar}
             onClick={() => avatarInputRef.current?.click()}
           >
-            {uploadingAvatar ? "Uploading…" : "Upload picture"}
+            {uploadingAvatar ? "Uploading…" : "Choose image"}
           </Button>
+          {pendingAvatar ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Choose “Use original” or crop it before uploading.
+            </p>
+          ) : null}
         </div>
       </section>
+
+      {cropOpen && pendingAvatar && pendingAvatarUrl ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/60 p-4 backdrop-blur-sm">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="crop-title"
+            className="w-full max-w-md rounded-3xl border border-border bg-card p-5 shadow-xl"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="crop-title" className="font-display text-xl font-bold">
+                  Edit profile picture
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Crop to a square only if you want to.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="text-sm text-muted-foreground"
+                onClick={() => {
+                  setCropOpen(false);
+                  setPendingAvatar(null);
+                  setPendingAvatarUrl(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="mt-5 overflow-hidden rounded-2xl bg-muted">
+              <img
+                src={pendingAvatarUrl}
+                alt="Selected profile picture preview"
+                className="mx-auto aspect-square max-h-[55vh] w-full object-contain"
+              />
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <Button
+                variant="outline"
+                disabled={uploadingAvatar}
+                onClick={() => {
+                  setCropOpen(false);
+                  void uploadAvatar(pendingAvatar);
+                }}
+              >
+                Use original
+              </Button>
+              <Button
+                disabled={uploadingAvatar}
+                onClick={async () => {
+                  const cropped = await cropToSquare(pendingAvatar);
+                  setCropOpen(false);
+                  void uploadAvatar(cropped);
+                }}
+              >
+                Crop and upload
+              </Button>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <div className="mt-6 rounded-2xl border border-gold/40 bg-gold/8 p-5">
         <FoundingBadge number={membership?.founding_number ?? null} size="md" showNumber={false} />
