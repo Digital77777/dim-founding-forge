@@ -207,9 +207,9 @@ function ReelCard({
 
   useEffect(() => {
     if (!mediaIsPlaying || !active || sheet) return;
-    const timer = window.setTimeout(() => setControlsVisible(false), 900);
+    const timer = window.setTimeout(() => setControlsVisible(false), controlsVisible ? 1800 : 900);
     return () => window.clearTimeout(timer);
-  }, [active, mediaIsPlaying, sheet]);
+  }, [active, controlsVisible, mediaIsPlaying, sheet]);
 
   const revealControls = () => setControlsVisible(true);
   const near = Math.abs(index - activeIndex) <= 1;
