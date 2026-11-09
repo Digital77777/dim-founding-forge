@@ -115,26 +115,30 @@ function AuthPage() {
     }
 
     if (mode === "signup") {
-      const result = await createConfirmedAccount({
-        data: { email: normalizedEmail, password, fullName: fullName.trim() },
-      });
-      if (!result.ok) {
+      try {
+        const result = await createConfirmedAccount({
+          data: { email: normalizedEmail, password, fullName: fullName.trim() },
+        });
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
+        const { error } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password,
+        });
+        if (error) {
+          toast.error("Your account was created, but we couldn't sign you in. Please try again.");
+          return;
+        }
+        toast.success("Welcome to DIM ELITE.");
+        setRedirecting(true);
+        navigate({ to: target, replace: true });
+      } catch {
+        toast.error("We couldn't complete your signup. Please try again.");
+      } finally {
         setBusy(false);
-        toast.error(result.error);
-        return;
       }
-      const { error } = await supabase.auth.signInWithPassword({
-        email: normalizedEmail,
-        password,
-      });
-      setBusy(false);
-      if (error) {
-        toast.error("Your account was created, but we couldn't sign you in. Please try again.");
-        return;
-      }
-      toast.success("Welcome to DIM ELITE.");
-      setRedirecting(true);
-      navigate({ to: target, replace: true });
       return;
     }
 
