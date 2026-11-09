@@ -18,7 +18,6 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 
-import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { initials, timeAgo, type PostAuthor } from "@/components/dim/CommunityPost";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -196,8 +195,23 @@ function ReelCard({
   const [expanded, setExpanded] = useState(false);
   const [sheet, setSheet] = useState(false);
   const [draft, setDraft] = useState("");
+  const [controlsVisible, setControlsVisible] = useState(true);
 
   const active = index === activeIndex;
+  const mediaIsPlaying = reel.youtube ? active : playing;
+  const clearView = active && mediaIsPlaying && !controlsVisible && !sheet;
+
+  useEffect(() => {
+    if (active) setControlsVisible(true);
+  }, [active]);
+
+  useEffect(() => {
+    if (!mediaIsPlaying || !active || sheet) return;
+    const timer = window.setTimeout(() => setControlsVisible(false), controlsVisible ? 1800 : 900);
+    return () => window.clearTimeout(timer);
+  }, [active, controlsVisible, mediaIsPlaying, sheet]);
+
+  const revealControls = () => setControlsVisible(true);
   const near = Math.abs(index - activeIndex) <= 1;
 
   useEffect(() => {
@@ -219,7 +233,8 @@ function ReelCard({
   return (
     <div
       ref={wrapRef}
-      className="relative h-[100svh] w-full snap-start snap-always overflow-hidden bg-ink"
+      onPointerDown={revealControls}
+      className="relative isolate h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full snap-start snap-always snap-stop-always overflow-hidden bg-ink"
     >
       <ReelMedia
         reel={reel}
@@ -232,16 +247,37 @@ function ReelCard({
           toggleRef.current = fn;
         }}
       />
+      {clearView ? (
+        <button
+          type="button"
+          aria-label="Show reel controls"
+          onPointerDown={revealControls}
+          className="absolute inset-0 z-10 cursor-default bg-transparent"
+        />
+      ) : null}
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-ink/80 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent" />
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-ink/80 to-transparent transition-opacity duration-300",
+          clearView && "opacity-0",
+        )}
+      />
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent transition-opacity duration-300",
+          clearView && "opacity-0",
+        )}
+      />
 
       {!playing && !reel.youtube && near ? (
         <button
           type="button"
           onClick={() => toggleRef.current?.()}
           aria-label="Play video"
-          className="absolute inset-0 grid place-items-center"
+          className={cn(
+            "absolute inset-0 grid place-items-center transition-opacity duration-300",
+            clearView && "pointer-events-none opacity-0",
+          )}
         >
           <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur">
             <Play className="size-7 fill-current" />
@@ -249,8 +285,18 @@ function ReelCard({
         </button>
       ) : null}
 
-      <div className="absolute bottom-28 right-3 flex flex-col items-center gap-5 text-ink-foreground">
-        <button type="button" onClick={onToggleLike} aria-label="Like" className="flex flex-col items-center">
+      <div
+        className={cn(
+          "absolute bottom-28 right-3 flex flex-col items-center gap-5 text-ink-foreground transition-opacity duration-300",
+          clearView && "pointer-events-none opacity-0",
+        )}
+      >
+        <button
+          type="button"
+          onClick={onToggleLike}
+          aria-label="Like"
+          className="flex flex-col items-center"
+        >
           <Heart className={cn("size-8 drop-shadow", liked && "fill-current text-destructive")} />
           <span className="mt-1 text-xs font-semibold">{likeCount}</span>
         </button>
@@ -283,7 +329,12 @@ function ReelCard({
         </button>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 px-4 pb-8">
+      <div
+        className={cn(
+          "absolute inset-x-0 bottom-0 px-4 pb-8 transition-opacity duration-300",
+          clearView && "pointer-events-none opacity-0",
+        )}
+      >
         <div className="flex items-center gap-3">
           <Avatar className="size-10 border border-ink-foreground/30">
             <AvatarImage src={author?.avatar_url ?? undefined} alt="" />
@@ -296,7 +347,6 @@ function ReelCard({
               <span className="truncate text-sm font-semibold text-ink-foreground">
                 {author?.full_name ?? "DIM member"}
               </span>
-              <FoundingBadge number={author?.founding_number ?? null} />
             </div>
             <p className="text-xs text-ink-foreground/70">{timeAgo(reel.created_at)}</p>
           </div>
@@ -420,46 +470,57 @@ function Reels() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [panel, setPanel] = useState(false);
   const [term, setTerm] = useState(search.q);
+  const [reelsPage, setReelsPage] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const data = useQuery({
-    queryKey: ["reels", userId],
+    queryKey: ["reels", userId, reelsPage],
     queryFn: async () => {
       const postsRes = await supabase
         .from("posts")
         .select("*")
         .eq("media_type", "video")
         .order("created_at", { ascending: false })
-        .limit(60);
+        .limit((reelsPage + 1) * 60);
       const rows = (postsRes.data ?? []).filter((p) => p.media_path || p.media_url);
       const ids = rows.map((p) => p.id);
       const authorIds = [...new Set(rows.map((p) => p.user_id))];
 
-      const [myLikesRes, likeCountsRes, commentsRes, profilesRes, membersRes, followsRes] = await Promise.all([
-        ids.length && userId
-          ? supabase.from("likes").select("post_id").eq("user_id", userId).in("post_id", ids)
-          : Promise.resolve({ data: [] }),
-        ids.length
-          ? supabase.from("like_counts").select("post_id, like_count").in("post_id", ids)
-          : Promise.resolve({ data: [] }),
-        ids.length
-          ? supabase.from("comments").select("*").in("post_id", ids).order("created_at")
-          : Promise.resolve({ data: [] }),
-        authorIds.length
-          ? supabase.from("profiles").select("id, full_name, headline, avatar_url").in("id", authorIds)
-          : Promise.resolve({ data: [] }),
-        authorIds.length
-          ? supabase.from("member_badges").select("user_id, founding_number").in("user_id", authorIds)
-          : Promise.resolve({ data: [] }),
-        userId
-          ? supabase.from("follows").select("following_id").eq("follower_id", userId)
-          : Promise.resolve({ data: [] }),
-      ]);
+      const [myLikesRes, likeCountsRes, commentsRes, profilesRes, membersRes, followsRes] =
+        await Promise.all([
+          ids.length && userId
+            ? supabase.from("likes").select("post_id").eq("user_id", userId).in("post_id", ids)
+            : Promise.resolve({ data: [] }),
+          ids.length
+            ? supabase.from("like_counts").select("post_id, like_count").in("post_id", ids)
+            : Promise.resolve({ data: [] }),
+          ids.length
+            ? supabase.from("comments").select("*").in("post_id", ids).order("created_at")
+            : Promise.resolve({ data: [] }),
+          authorIds.length
+            ? supabase
+                .from("profiles")
+                .select("id, full_name, headline, avatar_url")
+                .in("id", authorIds)
+            : Promise.resolve({ data: [] }),
+          authorIds.length
+            ? supabase
+                .from("member_badges")
+                .select("user_id, founding_number")
+                .in("user_id", authorIds)
+            : Promise.resolve({ data: [] }),
+          userId
+            ? supabase.from("follows").select("following_id").eq("follower_id", userId)
+            : Promise.resolve({ data: [] }),
+        ]);
 
       const paths = rows.map((p) => p.media_path).filter((p): p is string => !!p);
       const urls = new Map<string, string>();
       if (paths.length) {
-        const signed = await supabase.storage.from("community-media").createSignedUrls(paths, 60 * 60);
+        const signed = await supabase.storage
+          .from("community-media")
+          .createSignedUrls(paths, 60 * 60);
         (signed.data ?? []).forEach((entry, i) => {
           const path = paths[i];
           if (path && entry.signedUrl) urls.set(path, entry.signedUrl);
@@ -511,6 +572,20 @@ function Reels() {
   });
 
   const all = data.data?.reels ?? [];
+  const canLoadMore = all.length === (reelsPage + 1) * 60;
+
+  useEffect(() => {
+    const node = loadMoreRef.current;
+    if (!node || !canLoadMore) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && !data.isFetching) setReelsPage((page) => page + 1);
+      },
+      { root: containerRef.current, rootMargin: "640px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [canLoadMore, data.isFetching]);
 
   const allTags = useMemo(() => {
     const counts = new Map<string, number>();
@@ -531,7 +606,8 @@ function Reels() {
     const q = search.q.trim().toLowerCase();
     let list = all.filter((r) => {
       if (search.feed === "following" && !data.data?.following.has(r.user_id)) return false;
-      if (search.tag && !r.tags.some((t) => t.toLowerCase() === search.tag.toLowerCase())) return false;
+      if (search.tag && !r.tags.some((t) => t.toLowerCase() === search.tag.toLowerCase()))
+        return false;
       if (search.author && r.user_id !== search.author) return false;
       if (q) {
         const name = data.data?.authors.get(r.user_id)?.full_name?.toLowerCase() ?? "";
@@ -549,6 +625,7 @@ function Reels() {
 
   useEffect(() => {
     setActiveIndex(0);
+    setReelsPage(0);
     containerRef.current?.scrollTo({ top: 0 });
   }, [search.post, search.tag, search.author, search.feed, search.q]);
 
@@ -558,7 +635,6 @@ function Reels() {
     },
     [navigate, search],
   );
-
 
   async function toggleLike(postId: string, liked: boolean) {
     if (!userId) return;
@@ -570,7 +646,11 @@ function Reels() {
   async function toggleFollow(authorId: string, following: boolean) {
     if (!userId || authorId === userId) return;
     if (following)
-      await supabase.from("follows").delete().eq("follower_id", userId).eq("following_id", authorId);
+      await supabase
+        .from("follows")
+        .delete()
+        .eq("follower_id", userId)
+        .eq("following_id", authorId);
     else await supabase.from("follows").insert({ follower_id: userId, following_id: authorId });
     await queryClient.invalidateQueries({ queryKey: ["reels"] });
   }
@@ -642,7 +722,12 @@ function Reels() {
               </span>
             ) : null}
           </button>
-          <Button asChild size="icon" className="size-10 shrink-0 rounded-full" aria-label="Create a reel">
+          <Button
+            asChild
+            size="icon"
+            className="size-10 shrink-0 rounded-full"
+            aria-label="Create a reel"
+          >
             <Link to="/reels/create">
               <Plus className="size-5" />
             </Link>
@@ -801,7 +886,7 @@ function Reels() {
       ) : (
         <div
           ref={containerRef}
-          className="h-[100svh] snap-y snap-mandatory overflow-y-auto overscroll-contain"
+          className="fixed inset-0 z-20 h-[100dvh] snap-y snap-mandatory overflow-y-auto overscroll-y-contain overscroll-x-none touch-pan-y"
         >
           {reels.map((reel, i) => {
             const liked = (data.data?.likes ?? []).some((l) => l.post_id === reel.id);
@@ -831,6 +916,15 @@ function Reels() {
               />
             );
           })}
+          {canLoadMore ? (
+            <div
+              ref={loadMoreRef}
+              className="flex h-24 snap-start items-center justify-center text-sm text-ink-foreground/70"
+              aria-live="polite"
+            >
+              {data.isFetching ? "Loading more reels…" : "Swipe for more"}
+            </div>
+          ) : null}
         </div>
       )}
     </div>

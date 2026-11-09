@@ -1,18 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import {
-  Bookmark,
+  Archive,
   Clapperboard,
   Eye,
-  Heart,
-  MessageCircle,
+  MessageSquareText,
+  ThumbsUp,
   MoreHorizontal,
-  Play,
   Send,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-
-import { FoundingBadge } from "@/components/dim/FoundingBadge";
 import { youtubeEmbedUrl, youtubeId, youtubeThumb } from "@/lib/reels";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -96,7 +95,6 @@ function AuthorRow({
           <span className="truncate text-sm font-semibold">
             {author?.full_name ?? "DIM member"}
           </span>
-          <FoundingBadge number={author?.founding_number ?? null} />
         </div>
         <p className="text-xs text-muted-foreground">
           {timeAgo(post.created_at)} · {post.space_slug}
@@ -218,7 +216,7 @@ export function TextPostCard({
           {h.likeCount ? (
             <span className="inline-flex items-center gap-1">
               <span className="inline-flex size-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Heart className="size-2.5 fill-current" />
+                <ThumbsUp className="size-2.5 fill-current" />
               </span>
               {h.likeCount}
             </span>
@@ -244,14 +242,14 @@ export function TextPostCard({
             h.liked ? "text-primary" : "text-muted-foreground",
           )}
         >
-          <Heart className={cn("size-4", h.liked && "fill-current")} /> Like
+          <ThumbsUp className={cn("size-4", h.liked && "fill-current")} /> Like
         </button>
         <button
           type="button"
           onClick={() => setShowComments((v) => !v)}
           className="inline-flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted"
         >
-          <MessageCircle className="size-4" /> Comment
+          <MessageSquareText className="size-4" /> Comment
         </button>
       </div>
 
@@ -265,6 +263,24 @@ export function TextPostCard({
 }
 
 /** Image / video post — Instagram style card. */
+function SoundToggle({ muted, onToggle }: { muted: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={muted ? "Turn sound on" : "Mute video"}
+      aria-pressed={!muted}
+      className="absolute bottom-3 right-3 z-10 grid size-10 place-items-center rounded-full bg-ink/70 text-ink-foreground backdrop-blur transition hover:bg-ink/90"
+    >
+      {muted ? (
+        <VolumeX className="size-4" aria-hidden />
+      ) : (
+        <Volume2 className="size-4" aria-hidden />
+      )}
+    </button>
+  );
+}
+
 export function MediaPostCard({
   post,
   mediaUrl,
@@ -273,81 +289,108 @@ export function MediaPostCard({
   const [showComments, setShowComments] = useState(false);
   const [saved, setSaved] = useState(false);
   const [ytPlaying, setYtPlaying] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const mediaContainerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const yt = post.media_url ? youtubeId(post.media_url) : null;
+  const isYoutubeShort = Boolean(
+    post.media_url?.includes("/shorts/") || post.media_url?.includes("youtube.com/shorts"),
+  );
+
+  useEffect(() => {
+    const container = mediaContainerRef.current;
+    if (!container) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting && entry.intersectionRatio >= 0.6),
+      { threshold: [0, 0.6, 1] },
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || post.media_type !== "video") return;
+    if (inView) {
+      video.muted = isMuted;
+      void video.play().catch(() => undefined);
+    } else {
+      video.pause();
+    }
+  }, [inView, isMuted, post.media_type]);
   return (
     <article className="-mx-4 overflow-hidden border-y border-border bg-card shadow-sm sm:mx-0 sm:rounded-2xl sm:border">
       <div className="px-4 py-3">
         <AuthorRow author={h.authorFor(post.user_id)} post={post} compact />
       </div>
 
-      <div className="relative w-full bg-ink">
+      <div ref={mediaContainerRef} className="relative w-full bg-ink">
         {yt ? (
-          ytPlaying ? (
-            <div className="aspect-video w-full">
+          ytPlaying || inView ? (
+            <div
+              className={cn("relative w-full", isYoutubeShort ? "aspect-[9/16]" : "aspect-video")}
+            >
               <iframe
-                src={youtubeEmbedUrl(yt, { autoplay: true, muted: false })}
+                src={youtubeEmbedUrl(yt, { autoplay: true, muted: isMuted })}
                 title={post.title ?? "Community reel"}
                 className="size-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 loading="lazy"
               />
+              <SoundToggle muted={isMuted} onToggle={() => setIsMuted((value) => !value)} />
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={() => setYtPlaying(true)}
-              aria-label="Play reel"
-              className="group relative block aspect-video w-full"
+            <div
+              className={cn(
+                "relative block w-full",
+                isYoutubeShort ? "aspect-[9/16]" : "aspect-video",
+              )}
             >
               <img
                 src={youtubeThumb(yt)}
                 alt={post.title ?? "Community reel"}
                 loading="lazy"
-                className="size-full object-cover"
+                className="size-full bg-ink object-contain"
               />
               <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
-              <span className="pointer-events-none absolute inset-0 grid place-items-center">
-                <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur transition group-hover:scale-105">
-                  <Play className="size-7 fill-current" />
-                </span>
-              </span>
               <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
                 <Clapperboard className="size-3.5" /> Reel
               </span>
-            </button>
+            </div>
           )
         ) : mediaUrl ? (
           post.media_type === "video" ? (
-            <Link
-              to="/reels"
-              search={{ post: post.id }}
-              aria-label="Watch in Reels"
-              className="group relative block aspect-[4/5] w-full"
-            >
-              <video
-                src={mediaUrl}
-                muted
-                playsInline
-                preload="metadata"
-                className="size-full object-cover"
-              />
-              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
-              <span className="pointer-events-none absolute inset-0 grid place-items-center">
-                <span className="grid size-16 place-items-center rounded-full bg-ink/50 text-ink-foreground backdrop-blur transition group-hover:scale-105">
-                  <Play className="size-7 fill-current" />
+            <div className="relative aspect-[4/5] w-full">
+              <Link
+                to="/reels"
+                search={{ post: post.id }}
+                aria-label="Watch in Reels"
+                className="group relative block size-full"
+              >
+                <video
+                  ref={videoRef}
+                  src={mediaUrl}
+                  autoPlay={inView}
+                  muted={isMuted}
+                  playsInline
+                  preload="metadata"
+                  className="size-full object-cover"
+                />
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/20" />
+                <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
+                  <Clapperboard className="size-3.5" /> Reel
                 </span>
-              </span>
-              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-ink/60 px-2.5 py-1 text-[11px] font-semibold text-ink-foreground backdrop-blur">
-                <Clapperboard className="size-3.5" /> Reel
-              </span>
-            </Link>
+              </Link>
+              <SoundToggle muted={isMuted} onToggle={() => setIsMuted((value) => !value)} />
+            </div>
           ) : (
             <img
               src={mediaUrl}
               alt={post.title ?? "Community post"}
               loading="lazy"
-              className="aspect-[4/5] size-full object-cover"
+              className="block h-auto max-h-[70vh] w-full bg-muted object-contain"
             />
           )
         ) : (
@@ -357,7 +400,6 @@ export function MediaPostCard({
         )}
       </div>
 
-
       <div className="flex items-center gap-4 px-4 pt-3">
         <button
           type="button"
@@ -365,7 +407,7 @@ export function MediaPostCard({
           aria-label="Like"
           className={cn(h.liked ? "text-destructive" : "text-foreground")}
         >
-          <Heart className={cn("size-6", h.liked && "fill-current")} />
+          <ThumbsUp className={cn("size-6", h.liked && "fill-current")} />
         </button>
         <button
           type="button"
@@ -373,7 +415,7 @@ export function MediaPostCard({
           aria-label="Comments"
           className="text-foreground"
         >
-          <MessageCircle className="size-6" />
+          <MessageSquareText className="size-6" />
         </button>
         <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
           <Eye className="size-5" />
@@ -384,7 +426,7 @@ export function MediaPostCard({
           aria-label="Save"
           className={cn("ml-auto", saved ? "text-primary" : "text-foreground")}
         >
-          <Bookmark className={cn("size-6", saved && "fill-current")} />
+          <Archive className={cn("size-6", saved && "fill-current")} />
         </button>
       </div>
 
@@ -394,9 +436,6 @@ export function MediaPostCard({
         </p>
         {post.title ? <p className="text-sm font-semibold">{post.title}</p> : null}
         <div className="text-sm">
-          <span className="mr-1.5 font-semibold">
-            {h.authorFor(post.user_id)?.full_name ?? "DIM member"}
-          </span>
           <Clamped text={post.body} />
         </div>
         <TagRow tags={post.tags} />

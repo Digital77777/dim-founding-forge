@@ -54,14 +54,21 @@ export const STAGES: {
   },
 ];
 
-export const stageClasses: Record<StageKey, { text: string; bg: string; ring: string; dot: string }> =
-  {
-    learn: { text: "text-learn", bg: "bg-learn/10", ring: "ring-learn/30", dot: "bg-learn" },
-    build: { text: "text-build", bg: "bg-build/10", ring: "ring-build/30", dot: "bg-build" },
-    connect: { text: "text-connect", bg: "bg-connect/10", ring: "ring-connect/30", dot: "bg-connect" },
-    earn: { text: "text-earn", bg: "bg-earn/10", ring: "ring-earn/30", dot: "bg-earn" },
-    grow: { text: "text-grow", bg: "bg-grow/10", ring: "ring-grow/30", dot: "bg-grow" },
-  };
+export const stageClasses: Record<
+  StageKey,
+  { text: string; bg: string; ring: string; dot: string }
+> = {
+  learn: { text: "text-learn", bg: "bg-learn/10", ring: "ring-learn/30", dot: "bg-learn" },
+  build: { text: "text-build", bg: "bg-build/10", ring: "ring-build/30", dot: "bg-build" },
+  connect: {
+    text: "text-connect",
+    bg: "bg-connect/10",
+    ring: "ring-connect/30",
+    dot: "bg-connect",
+  },
+  earn: { text: "text-earn", bg: "bg-earn/10", ring: "ring-earn/30", dot: "bg-earn" },
+  grow: { text: "text-grow", bg: "bg-grow/10", ring: "ring-grow/30", dot: "bg-grow" },
+};
 
 export type NavItem = { label: string; to: string; icon: string; soon?: boolean };
 
@@ -97,6 +104,8 @@ export const NAV_GROUPS: { group: string; items: NavItem[] }[] = [
   {
     group: "Personal",
     items: [
+      { label: "My Inbox", to: "/inbox", icon: "messages-square" },
+      { label: "My Activity", to: "/activity", icon: "activity" },
       { label: "My Portfolio", to: "/portfolio", icon: "folder-open" },
       { label: "Achievements", to: "/achievements", icon: "award" },
       { label: "Progress", to: "/progress", icon: "chart-no-axes-column" },
@@ -134,7 +143,12 @@ export const TIERS = [
     price: "R95",
     cadence: "per month",
     line: "I want to build and earn.",
-    features: ["Creator learning", "Creator resources", "Challenges & templates", "Creator community"],
+    features: [
+      "Creator learning",
+      "Creator resources",
+      "Challenges & templates",
+      "Creator community",
+    ],
   },
   {
     name: "Career",
@@ -224,7 +238,8 @@ export const COMING_SOON_FEATURES: {
     key: "marketplace",
     title: "Marketplace",
     to: "/marketplace",
-    summary: "Digital products, services, templates, resources and freelance offerings from the DIM community.",
+    summary:
+      "Digital products, services, templates, resources and freelance offerings from the DIM community.",
     bullets: [
       "Digital products",
       "Services",
@@ -238,7 +253,8 @@ export const COMING_SOON_FEATURES: {
     key: "earn",
     title: "Earn",
     to: "/earn",
-    summary: "Skills become valuable when you can apply them. Earn brings the pathways together in one place.",
+    summary:
+      "Skills become valuable when you can apply them. Earn brings the pathways together in one place.",
     bullets: [
       "Creator opportunities",
       "Marketplace selling",
@@ -264,7 +280,8 @@ export const COMING_SOON_FEATURES: {
     key: "events",
     title: "Events",
     to: "/events",
-    summary: "DIM Open Days, workshops, webinars and community sessions — discover, register, attend, participate.",
+    summary:
+      "DIM Open Days, workshops, webinars and community sessions — discover, register, attend, participate.",
     bullets: [
       "DIM Open Days",
       "Workshops & webinars",

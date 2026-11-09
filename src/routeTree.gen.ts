@@ -21,6 +21,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SocietyRouteImport } from './routes/society'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedBuildRouteImport } from './routes/_authenticated/build'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
 import { Route as AuthenticatedComingSoonRouteImport } from './routes/_authenticated/coming-soon'
@@ -31,6 +32,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
 import { Route as AuthenticatedEliteBetaRouteImport } from './routes/_authenticated/elite-beta'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -39,16 +41,19 @@ import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as ExploreIndexRouteImport } from './routes/explore.index'
 import { Route as ExploreAreaRouteImport } from './routes/explore.$area'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AuthenticatedLearnIndexRouteImport } from './routes/_authenticated/learn.index'
 import { Route as AuthenticatedLearnCourseRouteImport } from './routes/_authenticated/learn.$course'
+import { Route as AuthenticatedMembersUserIdRouteImport } from './routes/_authenticated/members.$userId'
 import { Route as AuthenticatedReelsIndexRouteImport } from './routes/_authenticated/reels.index'
 import { Route as AuthenticatedReelsCreateRouteImport } from './routes/_authenticated/reels.create'
 import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
 import { Route as AuthenticatedToolsSlugRouteImport } from './routes/_authenticated/tools.$slug'
+import { Route as ApiCommunityAgentsDailyRouteImport } from './routes/api/community-agents.daily'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -110,6 +115,11 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBuildRoute = AuthenticatedBuildRouteImport.update({
   id: '/build',
   path: '/build',
@@ -160,6 +170,11 @@ const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMarketplaceRoute =
   AuthenticatedMarketplaceRouteImport.update({
     id: '/marketplace',
@@ -203,6 +218,11 @@ const AuthenticatedRoadmapRoute = AuthenticatedRoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const ExploreIndexRoute = ExploreIndexRouteImport.update({
   id: '/explore/',
   path: '/explore/',
@@ -234,6 +254,12 @@ const AuthenticatedLearnCourseRoute =
     path: '/learn/$course',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMembersUserIdRoute =
+  AuthenticatedMembersUserIdRouteImport.update({
+    id: '/members/$userId',
+    path: '/members/$userId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReelsIndexRoute = AuthenticatedReelsIndexRouteImport.update({
   id: '/reels/',
   path: '/reels/',
@@ -255,11 +281,16 @@ const AuthenticatedToolsSlugRoute = AuthenticatedToolsSlugRouteImport.update({
   path: '/tools/$slug',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiCommunityAgentsDailyRoute = ApiCommunityAgentsDailyRouteImport.update({
+  id: '/api/community-agents/daily',
+  path: '/api/community-agents/daily',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
@@ -268,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/coming-soon': typeof AuthenticatedComingSoonRoute
@@ -278,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/earn': typeof AuthenticatedEarnRoute
   '/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -286,13 +319,16 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/explore/$area': typeof ExploreAreaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/explore/': typeof ExploreIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
+  '/members/$userId': typeof AuthenticatedMembersUserIdRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
+  '/api/community-agents/daily': typeof ApiCommunityAgentsDailyRoute
   '/learn/': typeof AuthenticatedLearnIndexRoute
   '/reels/': typeof AuthenticatedReelsIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
@@ -300,7 +336,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
@@ -309,6 +345,7 @@ export interface FileRoutesByTo {
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/build': typeof AuthenticatedBuildRoute
   '/career': typeof AuthenticatedCareerRoute
   '/coming-soon': typeof AuthenticatedComingSoonRoute
@@ -319,6 +356,7 @@ export interface FileRoutesByTo {
   '/earn': typeof AuthenticatedEarnRoute
   '/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -327,13 +365,16 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/explore/$area': typeof ExploreAreaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/explore': typeof ExploreIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/learn/$course': typeof AuthenticatedLearnCourseRoute
+  '/members/$userId': typeof AuthenticatedMembersUserIdRoute
   '/reels/create': typeof AuthenticatedReelsCreateRoute
   '/tools/$slug': typeof AuthenticatedToolsSlugRoute
+  '/api/community-agents/daily': typeof ApiCommunityAgentsDailyRoute
   '/learn': typeof AuthenticatedLearnIndexRoute
   '/reels': typeof AuthenticatedReelsIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
@@ -343,7 +384,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/elite': typeof EliteRoute
   '/organisations': typeof OrganisationsRoute
@@ -352,6 +393,7 @@ export interface FileRoutesById {
   '/society': typeof SocietyRoute
   '/terms': typeof TermsRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
+  '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/build': typeof AuthenticatedBuildRoute
   '/_authenticated/career': typeof AuthenticatedCareerRoute
   '/_authenticated/coming-soon': typeof AuthenticatedComingSoonRoute
@@ -362,6 +404,7 @@ export interface FileRoutesById {
   '/_authenticated/earn': typeof AuthenticatedEarnRoute
   '/_authenticated/elite-beta': typeof AuthenticatedEliteBetaRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -370,13 +413,16 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/explore/$area': typeof ExploreAreaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/explore/': typeof ExploreIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/_authenticated/learn/$course': typeof AuthenticatedLearnCourseRoute
+  '/_authenticated/members/$userId': typeof AuthenticatedMembersUserIdRoute
   '/_authenticated/reels/create': typeof AuthenticatedReelsCreateRoute
   '/_authenticated/tools/$slug': typeof AuthenticatedToolsSlugRoute
+  '/api/community-agents/daily': typeof ApiCommunityAgentsDailyRoute
   '/_authenticated/learn/': typeof AuthenticatedLearnIndexRoute
   '/_authenticated/reels/': typeof AuthenticatedReelsIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
@@ -395,6 +441,7 @@ export interface FileRouteTypes {
     | '/society'
     | '/terms'
     | '/achievements'
+    | '/activity'
     | '/build'
     | '/career'
     | '/coming-soon'
@@ -405,6 +452,7 @@ export interface FileRouteTypes {
     | '/earn'
     | '/elite-beta'
     | '/events'
+    | '/inbox'
     | '/marketplace'
     | '/notifications'
     | '/onboarding'
@@ -413,13 +461,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/roadmap'
+    | '/auth/callback'
     | '/explore/$area'
     | '/insights/$slug'
     | '/explore/'
     | '/insights/'
     | '/learn/$course'
+    | '/members/$userId'
     | '/reels/create'
     | '/tools/$slug'
+    | '/api/community-agents/daily'
     | '/learn/'
     | '/reels/'
     | '/tools/'
@@ -436,6 +487,7 @@ export interface FileRouteTypes {
     | '/society'
     | '/terms'
     | '/achievements'
+    | '/activity'
     | '/build'
     | '/career'
     | '/coming-soon'
@@ -446,6 +498,7 @@ export interface FileRouteTypes {
     | '/earn'
     | '/elite-beta'
     | '/events'
+    | '/inbox'
     | '/marketplace'
     | '/notifications'
     | '/onboarding'
@@ -454,13 +507,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/roadmap'
+    | '/auth/callback'
     | '/explore/$area'
     | '/insights/$slug'
     | '/explore'
     | '/insights'
     | '/learn/$course'
+    | '/members/$userId'
     | '/reels/create'
     | '/tools/$slug'
+    | '/api/community-agents/daily'
     | '/learn'
     | '/reels'
     | '/tools'
@@ -478,6 +534,7 @@ export interface FileRouteTypes {
     | '/society'
     | '/terms'
     | '/_authenticated/achievements'
+    | '/_authenticated/activity'
     | '/_authenticated/build'
     | '/_authenticated/career'
     | '/_authenticated/coming-soon'
@@ -488,6 +545,7 @@ export interface FileRouteTypes {
     | '/_authenticated/earn'
     | '/_authenticated/elite-beta'
     | '/_authenticated/events'
+    | '/_authenticated/inbox'
     | '/_authenticated/marketplace'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
@@ -496,13 +554,16 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/progress'
     | '/_authenticated/roadmap'
+    | '/auth/callback'
     | '/explore/$area'
     | '/insights/$slug'
     | '/explore/'
     | '/insights/'
     | '/_authenticated/learn/$course'
+    | '/_authenticated/members/$userId'
     | '/_authenticated/reels/create'
     | '/_authenticated/tools/$slug'
+    | '/api/community-agents/daily'
     | '/_authenticated/learn/'
     | '/_authenticated/reels/'
     | '/_authenticated/tools/'
@@ -512,7 +573,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ContactRoute: typeof ContactRoute
   EliteRoute: typeof EliteRoute
   OrganisationsRoute: typeof OrganisationsRoute
@@ -524,6 +585,7 @@ export interface RootRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   ExploreIndexRoute: typeof ExploreIndexRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
+  ApiCommunityAgentsDailyRoute: typeof ApiCommunityAgentsDailyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -612,6 +674,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/activity': {
+      id: '/_authenticated/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AuthenticatedActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/build': {
       id: '/_authenticated/build'
       path: '/build'
@@ -682,6 +751,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/marketplace': {
       id: '/_authenticated/marketplace'
       path: '/marketplace'
@@ -738,6 +814,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRoadmapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/explore/': {
       id: '/explore/'
       path: '/explore'
@@ -780,6 +863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearnCourseRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/members/$userId': {
+      id: '/_authenticated/members/$userId'
+      path: '/members/$userId'
+      fullPath: '/members/$userId'
+      preLoaderRoute: typeof AuthenticatedMembersUserIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reels/': {
       id: '/_authenticated/reels/'
       path: '/reels'
@@ -808,11 +898,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedToolsSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/community-agents/daily': {
+      id: '/api/community-agents/daily'
+      path: '/api/community-agents/daily'
+      fullPath: '/api/community-agents/daily'
+      preLoaderRoute: typeof ApiCommunityAgentsDailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
+  AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedBuildRoute: typeof AuthenticatedBuildRoute
   AuthenticatedCareerRoute: typeof AuthenticatedCareerRoute
   AuthenticatedComingSoonRoute: typeof AuthenticatedComingSoonRoute
@@ -823,6 +921,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
   AuthenticatedEliteBetaRoute: typeof AuthenticatedEliteBetaRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -832,6 +931,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
   AuthenticatedLearnCourseRoute: typeof AuthenticatedLearnCourseRoute
+  AuthenticatedMembersUserIdRoute: typeof AuthenticatedMembersUserIdRoute
   AuthenticatedReelsCreateRoute: typeof AuthenticatedReelsCreateRoute
   AuthenticatedToolsSlugRoute: typeof AuthenticatedToolsSlugRoute
   AuthenticatedLearnIndexRoute: typeof AuthenticatedLearnIndexRoute
@@ -841,6 +941,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
+  AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedBuildRoute: AuthenticatedBuildRoute,
   AuthenticatedCareerRoute: AuthenticatedCareerRoute,
   AuthenticatedComingSoonRoute: AuthenticatedComingSoonRoute,
@@ -851,6 +952,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEarnRoute: AuthenticatedEarnRoute,
   AuthenticatedEliteBetaRoute: AuthenticatedEliteBetaRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
@@ -860,6 +962,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
   AuthenticatedLearnCourseRoute: AuthenticatedLearnCourseRoute,
+  AuthenticatedMembersUserIdRoute: AuthenticatedMembersUserIdRoute,
   AuthenticatedReelsCreateRoute: AuthenticatedReelsCreateRoute,
   AuthenticatedToolsSlugRoute: AuthenticatedToolsSlugRoute,
   AuthenticatedLearnIndexRoute: AuthenticatedLearnIndexRoute,
@@ -870,11 +973,21 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ContactRoute: ContactRoute,
   EliteRoute: EliteRoute,
   OrganisationsRoute: OrganisationsRoute,
@@ -886,6 +999,7 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsSlugRoute: InsightsSlugRoute,
   ExploreIndexRoute: ExploreIndexRoute,
   InsightsIndexRoute: InsightsIndexRoute,
+  ApiCommunityAgentsDailyRoute: ApiCommunityAgentsDailyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

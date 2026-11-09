@@ -1,6 +1,7 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useLocation } from "@tanstack/react-router";
+import { useEffect } from "react";
 
-import { AuthLoading } from "@/components/dim/AuthLoading";
+import { AppPageSkeleton } from "@/components/dim/AppPageSkeleton";
 import { SessionExpired } from "@/components/dim/SessionExpired";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,12 +48,24 @@ export const Route = createFileRoute("/_authenticated")({
     return { user: data.user };
   },
   pendingMs: 0,
-  pendingComponent: () => <AuthLoading />,
+  pendingComponent: AppPageSkeleton,
   errorComponent: () => (
     <SessionExpired
       title="We couldn't verify your session"
       message="Your sign-in may have expired or the connection dropped. Try signing in again — your progress is safe."
     />
   ),
-  component: () => <Outlet />,
+  component: AuthenticatedShell,
 });
+
+function AuthenticatedShell() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname !== "/onboarding") {
+      window.localStorage.setItem("dim:last-authenticated-route", location.pathname);
+    }
+  }, [location.pathname]);
+
+  return <Outlet />;
+}

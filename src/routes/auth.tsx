@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { AuthLoading } from "@/components/dim/AuthLoading";
 import { BETA_AVAILABILITY } from "@/lib/dim";
+import { createConfirmedAccount } from "@/lib/auth.functions";
 
 const TITLE = "Join DIM ELITE — Founding 1,000 Beta";
 const DESCRIPTION =
@@ -18,18 +18,22 @@ const DESCRIPTION =
 export const Route = createFileRoute("/auth")({
   staticData: { sitemap: false },
   ssr: false,
-  validateSearch: (search: Record<string, unknown>): {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): {
     reason?: string;
     redirect?: string;
-    mode?: "signin";
+    mode?: "signin" | "forgot" | "reset";
   } => {
-    const reason = typeof search['reason'] === "string" ? search['reason'] : undefined;
-    const raw = typeof search['redirect'] === "string" ? search['redirect'] : undefined;
+    const reason = typeof search["reason"] === "string" ? search["reason"] : undefined;
+    const raw = typeof search["redirect"] === "string" ? search["redirect"] : undefined;
     const redirect = raw?.startsWith("/") ? raw : undefined;
     return {
       ...(reason ? { reason } : {}),
       ...(redirect ? { redirect } : {}),
-      ...(search['mode'] === "signin" ? { mode: "signin" as const } : {}),
+      ...(search["mode"] === "signin" || search["mode"] === "forgot" || search["mode"] === "reset"
+        ? { mode: search["mode"] as "signin" | "forgot" | "reset" }
+        : {}),
     };
   },
   head: () => ({
@@ -48,7 +52,13 @@ function AuthPage() {
   const { reason, redirect, mode: initialMode } = Route.useSearch();
   const expired = reason === "expired";
   const target = redirect && redirect !== "/auth" ? redirect : "/community";
-  const [mode, setMode] = useState<"signup" | "signin">(expired || initialMode === "signin" ? "signin" : "signup");
+  const [mode, setMode] = useState<"signup" | "signin" | "forgot" | "reset">(
+    initialMode === "forgot" || initialMode === "reset"
+      ? initialMode
+      : expired || initialMode === "signin"
+        ? "signin"
+        : "signup",
+  );
   const [resolving, setResolving] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -75,18 +85,51 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: fullName },
-          emailRedirectTo: `${window.location.origin}/community`,
-        },
+    const normalizedEmail = email.trim().toLowerCase();
+    if (mode === "forgot") {
+      const callbackUrl = new URL("/auth/callback", window.location.origin);
+      callbackUrl.searchParams.set("redirect", "/auth?mode=reset");
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: callbackUrl.toString(),
       });
       setBusy(false);
       if (error) {
-        toast.error(error.message);
+        toast.error("We couldn't send the password reset email. Check the address and try again.");
+        return;
+      }
+      toast.success("Check your email for a password reset link.");
+      setMode("signin");
+      return;
+    }
+
+    if (mode === "reset") {
+      const { error } = await supabase.auth.updateUser({ password });
+      setBusy(false);
+      if (error) {
+        toast.error("We couldn't update your password. Please request a new reset link.");
+        return;
+      }
+      toast.success("Password updated. You can now sign in.");
+      setMode("signin");
+      return;
+    }
+
+    if (mode === "signup") {
+      const result = await createConfirmedAccount({
+        data: { email: normalizedEmail, password, fullName: fullName.trim() },
+      });
+      if (!result.ok) {
+        setBusy(false);
+        toast.error(result.error);
+        return;
+      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+      setBusy(false);
+      if (error) {
+        toast.error("Your account was created, but we couldn't sign you in. Please try again.");
         return;
       }
       toast.success("Welcome to DIM ELITE.");
@@ -95,7 +138,7 @@ function AuthPage() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
     setBusy(false);
     if (error) {
       toast.error(error.message);
@@ -106,24 +149,22 @@ function AuthPage() {
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    callbackUrl.searchParams.set("redirect", target);
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: callbackUrl.toString(),
+      },
     });
-    if (result.error) {
+    if (error) {
       toast.error("Google sign-in failed. Try again.");
-      return;
     }
-    if (result.redirected) return;
-    setRedirecting(true);
-    navigate({ to: target, replace: true });
   }
 
   if (redirecting || resolving) {
-    return (
-      <AuthLoading
-        label={redirecting ? "Signing you in…" : "Checking your session…"}
-      />
-    );
+    return <AuthLoading label={redirecting ? "Signing you in…" : "Checking your session…"} />;
   }
 
   return (
@@ -154,12 +195,22 @@ function AuthPage() {
       <div className="flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-sm">
           <h1 className="text-3xl font-bold">
-            {mode === "signup" ? "Claim your founding place" : "Welcome back"}
+            {mode === "signup"
+              ? "Claim your founding place"
+              : mode === "forgot"
+                ? "Reset your password"
+                : mode === "reset"
+                  ? "Choose a new password"
+                  : "Welcome back"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {mode === "signup"
               ? "Create your account to receive a Founding Member number."
-              : "Sign in to continue your DIM journey."}
+              : mode === "forgot"
+                ? "Enter your email and we'll send you a secure reset link."
+                : mode === "reset"
+                  ? "Enter a new password for your DIM ELITE account."
+                  : "Sign in to continue your DIM journey."}
           </p>
 
           {expired ? (
@@ -196,42 +247,74 @@ function AuthPage() {
                 autoComplete="email"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              />
-            </div>
+            {mode !== "forgot" ? (
+              <div className="space-y-2">
+                <Label htmlFor="password">{mode === "reset" ? "New password" : "Password"}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete={
+                    mode === "signup" || mode === "reset" ? "new-password" : "current-password"
+                  }
+                />
+              </div>
+            ) : null}
             <Button type="submit" className="w-full" disabled={busy}>
-              {mode === "signup" ? "Create my Elite account" : "Sign in"}
+              {mode === "signup"
+                ? "Create my Elite account"
+                : mode === "forgot"
+                  ? "Send reset link"
+                  : mode === "reset"
+                    ? "Update password"
+                    : "Sign in"}
             </Button>
           </form>
 
-          <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            or
-            <span className="h-px flex-1 bg-border" />
-          </div>
+          {mode === "signin" ? (
+            <button
+              type="button"
+              className="mt-4 w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
+              onClick={() => setMode("forgot")}
+            >
+              Forgot your password?
+            </button>
+          ) : null}
 
-          <Button variant="outline" className="w-full" onClick={google}>
-            Continue with Google
-          </Button>
+          {mode === "forgot" || mode === "reset" ? (
+            <button
+              type="button"
+              className="mt-6 w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
+              onClick={() => setMode("signin")}
+            >
+              Back to sign in
+            </button>
+          ) : null}
 
-          <button
-            type="button"
-            className="mt-6 w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
-            onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-          >
-            {mode === "signup"
-              ? "Already a member? Sign in"
-              : "New here? Claim a founding place"}
-          </button>
+          {mode === "signup" || mode === "signin" ? (
+            <>
+              <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                or
+                <span className="h-px flex-1 bg-border" />
+              </div>
+              <Button variant="outline" className="w-full" onClick={google}>
+                Continue with Google
+              </Button>
+              <button
+                type="button"
+                className="mt-6 w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
+                onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+              >
+                {mode === "signup"
+                  ? "Already a member? Sign in"
+                  : "New here? Claim a founding place"}
+              </button>
+            </>
+          ) : null}
         </div>
       </div>
     </main>

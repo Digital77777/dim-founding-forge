@@ -1,17 +1,29 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { streamText, gateway } from "ai";
 import { z } from "zod";
 
-import { createLovableAiGatewayRunIdFetch } from "./run-id.server";
-
 export const STAGE_KEYS = [
-  "discover", "assess", "learn", "build", "certify",
-  "showcase", "prepare", "connect", "apply", "grow",
+  "discover",
+  "assess",
+  "learn",
+  "build",
+  "certify",
+  "showcase",
+  "prepare",
+  "connect",
+  "apply",
+  "grow",
 ] as const;
 
 export const FEATURE_ROUTES = [
-  "/learn", "/build", "/tools", "/portfolio", "/profile",
-  "/community", "/connect", "/achievements", "/progress",
+  "/learn",
+  "/build",
+  "/tools",
+  "/portfolio",
+  "/profile",
+  "/community",
+  "/connect",
+  "/achievements",
+  "/progress",
 ] as const;
 
 const roadmapSchema = z.object({
@@ -39,23 +51,15 @@ export type CareerRoadmap = {
 };
 
 export class GatewayError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
     super(message);
   }
 }
 
 export async function generateCareerRoadmap(input: string): Promise<CareerRoadmap> {
-  const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) throw new GatewayError(500, "AI is not configured.");
-
-  const runIdFetch = createLovableAiGatewayRunIdFetch();
-  const provider = createOpenAI({
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    apiKey,
-    headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-    fetch: runIdFetch.fetch,
-  });
-
   const system = `You are DIM Career's advisor. Build an honest, practical career roadmap for the member.
 Return ONLY a JSON object, no markdown, with this shape:
 {"summary": string (2-3 sentences),
@@ -67,7 +71,7 @@ Recognised certifications (AWS, Microsoft, Google Cloud, etc.) may be suggested 
   let text: string;
   try {
     const result = streamText({
-      model: provider.responses("openai/gpt-6-astra"),
+      model: gateway("google/gemini-3-flash"),
       system,
       prompt: input,
       providerOptions: {
@@ -83,10 +87,15 @@ Recognised certifications (AWS, Microsoft, Google Cloud, etc.) may be suggested 
     text = await result.text;
   } catch (err) {
     const status = (err as { statusCode?: number }).statusCode ?? 500;
-    if (status === 429) throw new GatewayError(429, "The AI advisor is busy. Please try again in a minute.");
+    if (status === 429)
+      throw new GatewayError(429, "The AI advisor is busy. Please try again in a minute.");
     if (status === 402) throw new GatewayError(402, "AI credits have run out for this workspace.");
-    if (status === 403) throw new GatewayError(403, "AI access is currently blocked for this workspace.");
-    throw new GatewayError(status, "The AI advisor couldn't create your roadmap. Please try again.");
+    if (status === 403)
+      throw new GatewayError(403, "AI access is currently blocked for this workspace.");
+    throw new GatewayError(
+      status,
+      "The AI advisor couldn't create your roadmap. Please try again.",
+    );
   }
 
   const match = text.match(/\{[\s\S]*\}/);
@@ -103,14 +112,18 @@ Recognised certifications (AWS, Microsoft, Google Cloud, etc.) may be suggested 
     summary: parsed.summary.slice(0, 600),
     milestones: parsed.milestones.slice(0, 16).map((m, i) => ({
       id: `m${i + 1}`,
-      stage: (stages.includes(m.stage) ? m.stage : "grow") as CareerRoadmap["milestones"][number]["stage"],
+      stage: (stages.includes(m.stage)
+        ? m.stage
+        : "grow") as CareerRoadmap["milestones"][number]["stage"],
       title: m.title.slice(0, 80),
       detail: m.detail.slice(0, 300),
     })),
     next_steps: parsed.next_steps.slice(0, 3).map((s) => ({
       title: s.title.slice(0, 100),
       why: s.why.slice(0, 240),
-      route: (routes.includes(s.route) ? s.route : "/learn") as CareerRoadmap["next_steps"][number]["route"],
+      route: (routes.includes(s.route)
+        ? s.route
+        : "/learn") as CareerRoadmap["next_steps"][number]["route"],
     })),
   };
 }

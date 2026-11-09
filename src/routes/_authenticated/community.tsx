@@ -1,7 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Activity, Calendar, ImagePlus, Lightbulb, MessageCircle, Play, TrendingUp, Users, UserSearch, X } from "lucide-react";
-import { useRef, useState } from "react";
+import {
+  Activity,
+  Calendar,
+  ImagePlus,
+  MessageCircle,
+  Play,
+  Users,
+  UserSearch,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/dim/AppShell";
@@ -15,7 +24,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { youtubeId } from "@/lib/reels";
 import { useMember } from "@/hooks/use-member";
@@ -27,9 +42,17 @@ export const Route = createFileRoute("/_authenticated/community")({
   head: () => ({
     meta: [
       { title: "DIM Community | Discussions, Reels & Member Spaces" },
-      { name: "description", content: "Connect with DIM members, explore community spaces, and share discussions, photos and reels." },
+      {
+        name: "description",
+        content:
+          "Connect with DIM members, explore community spaces, and share discussions, photos and reels.",
+      },
       { property: "og:title", content: "DIM Community | Discussions, Reels & Member Spaces" },
-      { property: "og:description", content: "Connect with DIM members, explore community spaces, and share discussions, photos and reels." },
+      {
+        property: "og:description",
+        content:
+          "Connect with DIM members, explore community spaces, and share discussions, photos and reels.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -37,19 +60,12 @@ export const Route = createFileRoute("/_authenticated/community")({
   component: Community,
 });
 
-const QUICK_LINKS = [
-  { icon: TrendingUp, label: "Progress", to: "/progress" as const },
-  { icon: Lightbulb, label: "AI Tools", to: "/tools" as const },
-  
-];
-
 function Community() {
   const { userId } = useMember();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [space, setSpace] = useState<string | null>(null);
-  const [mine, setMine] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState("");
@@ -57,16 +73,18 @@ function Community() {
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
+  const [feedPage, setFeedPage] = useState(0);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const data = useQuery({
-    queryKey: ["community", space, userId],
+    queryKey: ["community", space, userId, feedPage],
     queryFn: async () => {
       const spacesRes = await supabase.from("community_spaces").select("*").order("sort");
       let postQuery = supabase
         .from("posts")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(40);
+        .limit((feedPage + 1) * 40);
       if (space) postQuery = postQuery.eq("space_slug", space);
       const postsRes = await postQuery;
       const posts = (postsRes.data ?? []) as CommunityPostRow[];
@@ -89,7 +107,10 @@ function Community() {
               .in("id", authorIds)
           : Promise.resolve({ data: [] }),
         authorIds.length
-          ? supabase.from("member_badges").select("user_id, founding_number").in("user_id", authorIds)
+          ? supabase
+              .from("member_badges")
+              .select("user_id, founding_number")
+              .in("user_id", authorIds)
           : Promise.resolve({ data: [] }),
       ]);
 
@@ -135,6 +156,24 @@ function Community() {
   });
 
   const d = data.data;
+  const canLoadMore = (d?.posts.length ?? 0) === (feedPage + 1) * 40;
+
+  useEffect(() => {
+    const node = loadMoreRef.current;
+    if (!node || !canLoadMore) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && !data.isFetching) setFeedPage((page) => page + 1);
+      },
+      { rootMargin: "640px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [canLoadMore, data.isFetching]);
+
+  useEffect(() => {
+    setFeedPage(0);
+  }, [space, userId]);
 
   function pickFile(f: File | null) {
     if (preview) URL.revokeObjectURL(preview);
@@ -191,7 +230,8 @@ function Community() {
         .from("posts")
         .select("id", { count: "exact", head: true })
         .eq("user_id", userId);
-      if ((count ?? 0) >= 5) await awardAchievement(userId, "community_builder", "Community Builder");
+      if ((count ?? 0) >= 5)
+        await awardAchievement(userId, "community_builder", "Community Builder");
       await queryClient.invalidateQueries({ queryKey: ["community"] });
       setComposerOpen(false);
       toast.success("Shared with the community.");
@@ -213,164 +253,118 @@ function Community() {
     await queryClient.invalidateQueries({ queryKey: ["community"] });
   }
 
-  const visible = (d?.posts ?? []).filter((p) =>
-    mine ? p.user_id === userId : true,
-  );
+  const visible = d?.posts ?? [];
 
   const railChip =
-    "inline-flex h-10 shrink-0 snap-start items-center gap-2 rounded-full border border-primary/20 bg-card px-4 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none";
-
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
-      block: "start",
-    });
+    "inline-flex h-9 w-max shrink-0 snap-start items-center justify-center gap-1.5 rounded-full border border-primary/20 bg-card px-3 text-xs font-semibold whitespace-nowrap text-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 active:scale-95 motion-reduce:transition-none";
 
   const communityScrollHeader = (
     <div className="mx-auto max-w-7xl py-2.5">
       <div
-        className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex w-full min-w-0 cursor-grab snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain scroll-smooth px-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden active:cursor-grabbing"
         aria-label="Community features"
       >
-        <button
-          type="button"
-          className={cn(railChip, "border-transparent bg-ember text-primary-foreground shadow-glow hover:bg-ember")}
-          onClick={() => setComposerOpen(true)}
-        >
-          <ImagePlus className="size-4" /> Create a post
+        <button type="button" className={railChip} onClick={() => setComposerOpen(true)}>
+          <ImagePlus className="size-3.5 shrink-0 text-primary sm:size-4" /> Create a post
         </button>
         <Link to="/events" className={railChip}>
-          <Calendar className="size-4 text-primary" /> Browse events
+          <Calendar className="size-3.5 shrink-0 text-primary sm:size-4" /> Browse events
         </Link>
-        <Link to="/notifications" className={railChip}>
-          <MessageCircle className="size-4 text-primary" /> My inbox
+        <Link to="/inbox" className={railChip}>
+          <MessageCircle className="size-3.5 shrink-0 text-primary sm:size-4" /> My inbox
         </Link>
-        <button
-          type="button"
-          aria-pressed={mine}
-          className={cn(railChip, mine && "border-primary bg-primary/10 text-primary")}
-          onClick={() => {
-            setMine(!mine);
-            scrollTo("feed");
-          }}
-        >
-          <Activity className="size-4 text-primary" /> My activity
-        </button>
+        <Link to="/activity" className={railChip}>
+          <Activity className="size-3.5 shrink-0 text-primary sm:size-4" /> My activity
+        </Link>
         <Link to="/connect" className={railChip}>
-          <UserSearch className="size-4 text-primary" /> Find members
+          <UserSearch className="size-3.5 shrink-0 text-primary sm:size-4" /> Find members
         </Link>
-        {QUICK_LINKS.map((item) => (
-          <Link key={item.label} to={item.to} className={railChip}>
-            <item.icon className="size-4 text-primary" /> {item.label}
-          </Link>
-        ))}
-        <span className="w-1 shrink-0" aria-hidden />
       </div>
     </div>
   );
-
-  const spacePill = (active: boolean) =>
-    cn(
-      "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors",
-      active
-        ? "border-transparent bg-primary text-primary-foreground shadow-sm"
-        : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
-    );
 
   return (
     <AppShell scrollHeader={communityScrollHeader}>
       <header className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">DIM Community</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+            DIM Community
+          </p>
           <h1 className="mt-1 font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-            {mine ? "My activity" : "Community feed"}
+            Community feed
           </h1>
         </div>
       </header>
 
-      {/* Spaces */}
-      <div
-        className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        aria-label="Community spaces"
-      >
-        <button onClick={() => setSpace(null)} className={spacePill(!space)}>
-          All spaces
-        </button>
-        {(d?.spaces ?? []).map((s) => (
-          <button key={s.slug} onClick={() => setSpace(s.slug)} className={spacePill(space === s.slug)}>
-            {s.name}
-          </button>
-        ))}
-      </div>
-
       {/* Composer (opened from "Create a post") */}
       <Sheet open={composerOpen} onOpenChange={setComposerOpen}>
-        <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto rounded-t-3xl pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
-        <SheetHeader className="text-left">
-          <SheetTitle className="font-display">Create a post</SheetTitle>
-          <SheetDescription>Share what you're learning, building or figuring out.</SheetDescription>
-        </SheetHeader>
-        <Input
-          className="mt-3"
-          placeholder="Headline (optional)"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <Textarea
-          className="mt-3"
-          rows={3}
-          placeholder="What are you learning, building or figuring out?"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-        />
-        <Input
-          className="mt-3"
-          placeholder="Tags, e.g. ai-tools research"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-        />
+        <SheetContent
+          side="bottom"
+          className="max-h-[90vh] overflow-y-auto rounded-t-3xl pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+        >
+          <SheetHeader className="text-left">
+            <SheetTitle className="font-display">Create a post</SheetTitle>
+            <SheetDescription>
+              Share what you're learning, building or figuring out.
+            </SheetDescription>
+          </SheetHeader>
+          <Input
+            className="mt-3"
+            placeholder="Headline (optional)"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <Textarea
+            className="mt-3"
+            rows={3}
+            placeholder="What are you learning, building or figuring out?"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
+          <Input
+            className="mt-3"
+            placeholder="Tags, e.g. ai-tools research"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+          />
 
-        {preview ? (
-          <div className="relative mt-3 overflow-hidden rounded-xl border border-border">
-            {file?.type.startsWith("video/") ? (
-              <video src={preview} controls className="max-h-72 w-full bg-ink object-contain" />
-            ) : (
-              <img src={preview} alt="Selected upload" className="max-h-72 w-full object-cover" />
-            )}
-            <button
-              type="button"
-              onClick={() => pickFile(null)}
-              aria-label="Remove attachment"
-              className="absolute right-2 top-2 rounded-full bg-ink/70 p-1.5 text-ink-foreground"
-            >
-              <X className="size-4" />
-            </button>
+          {preview ? (
+            <div className="relative mt-3 overflow-hidden rounded-xl border border-border">
+              {file?.type.startsWith("video/") ? (
+                <video src={preview} controls className="max-h-72 w-full bg-ink object-contain" />
+              ) : (
+                <img src={preview} alt="Selected upload" className="max-h-72 w-full object-cover" />
+              )}
+              <button
+                type="button"
+                onClick={() => pickFile(null)}
+                aria-label="Remove attachment"
+                className="absolute right-2 top-2 rounded-full bg-ink/70 p-1.5 text-ink-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          ) : null}
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,video/*"
+            className="hidden"
+            onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+          />
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Button variant="outline" onClick={() => fileRef.current?.click()}>
+              <ImagePlus className="mr-1 size-4" /> Photo
+            </Button>
+            <Button variant="outline" onClick={() => fileRef.current?.click()}>
+              <Play className="mr-1 size-4" /> Video
+            </Button>
+            <Button className="ml-auto" onClick={post} disabled={busy || (!body.trim() && !file)}>
+              {busy ? "Posting…" : "Post"}
+            </Button>
           </div>
-        ) : null}
-
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*,video/*"
-          className="hidden"
-          onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
-        />
-
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Button variant="outline" onClick={() => fileRef.current?.click()}>
-            <ImagePlus className="mr-1 size-4" /> Photo
-          </Button>
-          <Button variant="outline" onClick={() => fileRef.current?.click()}>
-            <Play className="mr-1 size-4" /> Video
-          </Button>
-          <Button
-            className="ml-auto"
-            onClick={post}
-            disabled={busy || (!body.trim() && !file)}
-          >
-            {busy ? "Posting…" : "Post"}
-          </Button>
-        </div>
         </SheetContent>
       </Sheet>
 
@@ -394,6 +388,15 @@ function Community() {
             <TextPostCard key={p.id} {...props} />
           );
         })}
+        {canLoadMore ? (
+          <div
+            ref={loadMoreRef}
+            className="flex min-h-16 items-center justify-center text-sm text-muted-foreground"
+            aria-live="polite"
+          >
+            {data.isFetching ? "Loading more posts…" : "Scroll for more"}
+          </div>
+        ) : null}
         {!data.isLoading && visible.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Nothing here yet — be the first founding member to start the conversation.
