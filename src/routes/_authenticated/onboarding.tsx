@@ -70,15 +70,16 @@ function Onboarding() {
     setSaving(true);
     setSaveError(null);
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: userId,
         goals,
         interests,
         experience_level: level || null,
         onboarding_completed: true,
-      })
-      .eq("id", userId);
+      },
+      { onConflict: "id" },
+    );
 
     if (error) {
       console.error("[v0] Onboarding save failed:", error);
