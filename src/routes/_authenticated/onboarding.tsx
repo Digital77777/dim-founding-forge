@@ -49,12 +49,16 @@ function Onboarding() {
   const [level, setLevel] = useState<string>("");
   const [interests, setInterests] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Make sure a Founding Member number exists before screen one renders.
   useEffect(() => {
     if (!userId || isLoading || membership) return;
-    const name = (profile?.full_name ?? user?.user_metadata?.["full_name"] ?? null) as string | null;
-    supabase.rpc("claim_membership", name ? { _full_name: name } : {}).then(() => invalidateMember());
+    const name = (profile?.full_name ?? user?.user_metadata?.["full_name"] ?? null) as
+      string | null;
+    supabase
+      .rpc("claim_membership", name ? { _full_name: name } : {})
+      .then(() => invalidateMember());
   }, [userId, isLoading, membership, profile, user, invalidateMember]);
 
   function toggle(list: string[], set: (v: string[]) => void, value: string) {
@@ -64,15 +68,26 @@ function Onboarding() {
   async function finish() {
     if (!userId) return;
     setSaving(true);
-    await supabase
-      .from("profiles")
-      .update({
+    setSaveError(null);
+
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: userId,
         goals,
         interests,
         experience_level: level || null,
         onboarding_completed: true,
-      })
-      .eq("id", userId);
+      },
+      { onConflict: "id" },
+    );
+
+    if (error) {
+      console.error("[v0] Onboarding save failed:", error);
+      setSaveError("We couldn't save your setup. Please try again.");
+      setSaving(false);
+      return;
+    }
+
     await invalidateMember();
     setSaving(false);
     navigate({ to: "/community" });
@@ -86,7 +101,11 @@ function Onboarding() {
       canContinue: true,
       content: (
         <div className="mt-6 rounded-2xl border border-gold/40 bg-gold/8 p-6">
-          <FoundingBadge number={membership?.founding_number ?? null} size="lg" showNumber={false} />
+          <FoundingBadge
+            number={membership?.founding_number ?? null}
+            size="lg"
+            showNumber={false}
+          />
           <p className="mt-4 font-display text-4xl font-extrabold tabular-nums text-gold-foreground">
             {foundingLabel(membership?.founding_number) ?? "Assigning…"}
           </p>
@@ -191,6 +210,12 @@ function Onboarding() {
           <h1 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">{current.title}</h1>
           <p className="mt-3 text-muted-foreground">{current.body}</p>
           {current.content}
+
+          {saveError ? (
+            <p role="alert" className="mt-4 text-sm text-destructive">
+              {saveError}
+            </p>
+          ) : null}
 
           <div className="mt-8 flex items-center justify-between gap-3">
             <Button
